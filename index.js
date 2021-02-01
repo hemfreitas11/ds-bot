@@ -43,8 +43,9 @@ client.on('message', message => {
 					message.react('🇧🇷')
 					return message
 				})
+				.catch(error => {})
 		}
-	} catch(ignore) { }
+	} catch(ignore) {}
 })
 
 const ptMsg = displayName => {
@@ -98,7 +99,9 @@ client.on('messageReactionAdd', (reaction, user) => {
 		const ptRole = guild.roles.cache.find(r => r.name === 'Portugues')
 		const engRole = guild.roles.cache.find(r => r.name === 'English')
 
-		member.send(emoji.name == '🇺🇸' ? engMsg(member.displayName) : ptMsg(member.displayName)).then(message => message.react('👍'))
+		member.send(emoji.name == '🇺🇸' ? engMsg(member.displayName) : ptMsg(member.displayName))
+			.then(message => message.react('👍'))
+			.catch(error => {})
 		member.roles.add(emoji.name == '🇺🇸' ? engRole : ptRole)
 	}
 })
@@ -135,10 +138,8 @@ client.on('messageReactionRemove', (reaction, user) => {
 				// 	toDelete -= 1
 				// }
 			})
-			.catch(console.error);
-		} catch (error) {
-			console.log(error)
-		}
+			.catch(error => {});
+		} catch (ignored) { }
 
 		let message = reaction.message, emoji = reaction.emoji;
 
