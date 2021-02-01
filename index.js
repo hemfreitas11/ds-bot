@@ -113,7 +113,6 @@ client.on('messageReactionRemove', (reaction, user) => {
 		const guild = reaction.message.guild
 		const ptRole = guild.roles.cache.find(r => r.name === 'Portugues')
 		const engRole = guild.roles.cache.find(r => r.name === 'English')
-		console.log(user.dmChannel)
 		
 		try {
 			user.dmChannel.messages.fetch()
