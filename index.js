@@ -44,9 +44,7 @@ client.on('message', message => {
 					return message
 				})
 		}
-	} catch(error) {
-		console.log(error)
-	}
+	} catch(ignore) { }
 })
 
 const ptMsg = displayName => {
