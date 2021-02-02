@@ -315,9 +315,30 @@ const erroCor = "#FF1B00"
 
 const listaCmds = new Fuse(cmdsArray, options)
 
+let status = false
+
 client.once('ready', async () => {
 	try {
 		client.channels.cache.get(canalRegistro).messages.fetch(undefined, true)
+		
+		let prevNum = 0
+		let ale = 0
+
+		setInterval(() => {
+			while (ale == prevNum) ale = Math.floor(Math.random()*14)
+			prevNum = ale
+			if (status){ 
+				client.user.setActivity(`!help ${cmdsArray[ale].nome[0]}`, {
+					type: 'PLAYING'
+				})
+				status = false
+			} else {
+				client.user.setActivity(`!ajuda ${cmdsArray[ale].nome[1]}`, {
+					type: 'PLAYING'
+				})
+				status = true
+			}
+		}, 4000);
 		// setInterval(() => {
 		// 	if (mutedUsers.users.length > 0) {
 		// 		mutedUsers.users.forEach(user => {
@@ -396,7 +417,7 @@ client.on('message', message => {
 							)
 							.setFooter(`${sugested}: \n!${help} ${comandos[1].item.nome[key] || 'null'}   !${help} ${comandos[2].item.nome[key] || 'null'}   !${help} ${comandos[3].item.nome[key]|| 'null'}   !${help} ${comandos[4].item.nome[key]|| 'null'}`)
 						)
-						
+
 					} else {
 						let n = isEnglish ? 'Command not found' : 'Comando não encontrado'
 						let v = isEnglish ? `The command '${args.toString()}' was not found, try again!` : `O comando '${args.toString()}' não foi encontrado, tente novamente!`
