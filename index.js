@@ -1,13 +1,319 @@
 const Discord = require('discord.js')
+const Fuse = require('fuse.js')
+const fs = require('fs')
 const client = new Discord.Client()
 const token = 'NzQ3MTU4NjYwNzQ0MjE2Njc4.X0Kzug.r0PMdmsZI7oXLHUaQWtIWUnLI70'
-const fs = require('fs')
 const prefix = '!'
 client.commands = new Discord.Collection()
+
 const canalRegistro = '748731824804462702'
 const idBot = '747158660744216678'
 
-client.once('ready', () => {
+let cmdsArray = [
+	{
+		"plugin": ["Bkteleport", "BkTeleporte"],
+		"nome": ["tpa", "tpa"],
+		"desc": ["Sends a teleport request to a player", "Manda um pedido de teleporte para um jogador"],
+		"uso": ["/tpa <player>", "/tpa <jogador>"],
+		"perm": "bkteleport.tpa"
+	},
+	{
+		"plugin": ["Bkteleport", "BkTeleporte"],
+		"nome": ["home", "casa"],
+		"desc": ["Teleports you to your home", "Teleporta você para a sua casa"],
+		"uso": ["/home <home>", "/casa <casa>"],
+		"perm": "bkteleport.home"
+	},
+	{
+		"plugin": ["Bkteleport", "BkTeleporte"],
+		"nome": ["warp", "warp"],
+		"desc": ["Teleports you to a warp", "Teleporta para uma warp"],
+		"uso": ["/warp <warp>", "/warp <nome>"],
+		"perm": "bkteleport.warp"
+	},
+	{
+		"plugin": ["Bkteleport", "BkTeleporte"],
+		"nome": ["tphere", "tpaqui"],
+		"desc": ["Asks another player to teleport to you.", "Pede que outro jogador teleporte ate voce."],
+		"uso": ["/tphere <player>", "/tpaqui <jogador>"],
+		"perm": "bkteleport.tphere"
+	},
+	{
+		"plugin": ["Bkteleport", "BkTeleporte"],
+		"nome": ["tpaccept", "tpaceitar"],
+		"desc": ["Accepts a teleport request", "Aceita o pedido de teleporte recebido"],
+		"uso": ["/tpaccept <player>", "/tpaceitar <jogador>"],
+		"perm": "N/A"
+	},
+	{
+		"plugin": ["Bkteleport", "BkTeleporte"],
+		"nome": ["tpdeny", "tpnegar"],
+		"desc": ["Declines a teleport request", "Recusa o pedido de teleporte recebido"],
+		"uso": ["/tpdeny <player>", "/tpnegar <jogador>"],
+		"perm": "N/A"
+	},
+	{
+		"plugin": ["Bkteleport", "BkTeleporte"],
+		"nome": ["homes", "casas"],
+		"desc": ["Shows a list of your homes", "Mostra uma lista das suas casas"],
+		"uso": ["/homes", "/casas"],
+		"perm": "N/A"
+	},
+	{
+		"plugin": ["Bkteleport", "BkTeleporte"],
+		"nome": ["sethome", "setcasa"],
+		"desc": ["Sets a home", "Define o local da sua casa"],
+		"uso": ["/sethome <home-name>", "/setcasa <casa>"],
+		"perm": "bkteleport.sethome"
+	},
+	{
+		"plugin": ["Bkteleport", "BkTeleporte"],
+		"nome": ["delhome", "delcasa"],
+		"desc": ["Deletes one of your homes", "Deleta uma de suas casas"],
+		"uso": ["/delhome <home-name>", "/delcasa <casa>"],
+		"perm": "bkteleport.delhome"
+	},
+	{
+		"plugin": ["Bkteleport", "BkTeleporte"],
+		"nome": ["warps", "warps"],
+		"desc": ["Shows a list of warps", "Mostra a lista de warps"],
+		"uso": ["/warps", "/warps"],
+		"perm": "N/A"
+	},
+	{
+		"plugin": ["Bkteleport", "BkTeleporte"],
+		"nome": ["setwarp", "setwarp"],
+		"desc": ["Sets a warp", "Define uma warp"],
+		"uso": ["/setwarp <warp-name>", "/setwarp <nome>"],
+		"perm": "bkteleport.setwarp "
+	},
+	{
+		"plugin": ["Bkteleport", "BkTeleporte"],
+		"nome": ["delwarp", "delwarp"],
+		"desc": ["Deletes a warp", "Deleta uma warp"],
+		"uso": ["/delwarp <warp-name>", "/delwarp <nome>"],
+		"perm": "bkteleport.delwarp "
+	},
+	{
+		"plugin": ["BkShop", "BkLoja"],
+		"nome": ["shop", "loja"],
+		"desc": ["Teleports you to another player's shop", "Teleporta você para a loja de um jogador"],
+		"uso": ["/shop <player>", "/loja <jogador>"],
+		"perm": "bkshop.shop"
+	},
+	{
+		"plugin": ["BkShop", "BkLoja"],
+		"nome": ["shops", "lojas"],
+		"desc": ["Opens a list of all the shops available", "Abre uma lista das lojas disponíveis"],
+		"uso": ["/shops", "/lojas"],
+		"perm": "N/A"
+	},
+	{
+		"plugin": ["BkShop", "BkLoja"],
+		"nome": ["setshop", "setloja"],
+		"desc": ["Sets the location, color, or message of your shop", "Define o local da sua loja e adiciona ela na lista de lojas"],
+		"uso": ["/setshop <shop | color | message>", "/setloja <loja | cor | mensagem>"],
+		"perm": "bkshop.setshop"
+	},
+	{
+		"plugin": ["BkShop", "BkLoja"],
+		"nome": ["delshop", "delloja"],
+		"desc": ["Deletes your shop", "Deleta sua loja"],
+		"uso": ["/delshop", "/delloja"],
+		"perm": "bkshop.delshop"
+	}
+]
+
+/* let list = [
+	{
+	  "comando": "permi",
+	  "author": {
+		"firstName": "John",
+		"lastName": "Scalzi"
+	  }
+	},
+	{
+	  "title": "The Lock Artist",
+	  "author": {
+		"firstName": "Steve",
+		"lastName": "Hamilton"
+	  }
+	},
+	{
+	  "title": "HTML5",
+	  "author": {
+		"firstName": "Remy",
+		"lastName": "Sharp"
+	  }
+	},
+	{
+	  "title": "Right Ho Jeeves",
+	  "author": {
+		"firstName": "P.D",
+		"lastName": "Woodhouse"
+	  }
+	},
+	{
+	  "title": "The Code of the Wooster",
+	  "author": {
+		"firstName": "P.D",
+		"lastName": "Woodhouse"
+	  }
+	},
+	{
+	  "title": "Thank You Jeeves",
+	  "author": {
+		"firstName": "P.D",
+		"lastName": "Woodhouse"
+	  }
+	},
+	{
+	  "title": "The DaVinci Code",
+	  "author": {
+		"firstName": "Dan",
+		"lastName": "Brown"
+	  }
+	},
+	{
+	  "title": "Angels & Demons",
+	  "author": {
+		"firstName": "Dan",
+		"lastName": "Brown"
+	  }
+	},
+	{
+	  "title": "The Silmarillion",
+	  "author": {
+		"firstName": "J.R.R",
+		"lastName": "Tolkien"
+	  }
+	},
+	{
+	  "title": "Syrup",
+	  "author": {
+		"firstName": "Max",
+		"lastName": "Barry"
+	  }
+	},
+	{
+	  "title": "The Lost Symbol",
+	  "author": {
+		"firstName": "Dan",
+		"lastName": "Brown"
+	  }
+	},
+	{
+	  "title": "The Book of Lies",
+	  "author": {
+		"firstName": "Brad",
+		"lastName": "Meltzer"
+	  }
+	},
+	{
+	  "title": "Lamb",
+	  "author": {
+		"firstName": "Christopher",
+		"lastName": "Moore"
+	  }
+	},
+	{
+	  "title": "Fool",
+	  "author": {
+		"firstName": "Christopher",
+		"lastName": "Moore"
+	  }
+	},
+	{
+	  "title": "Incompetence",
+	  "author": {
+		"firstName": "Rob",
+		"lastName": "Grant"
+	  }
+	},
+	{
+	  "title": "Fat",
+	  "author": {
+		"firstName": "Rob",
+		"lastName": "Grant"
+	  }
+	},
+	{
+	  "title": "Colony",
+	  "author": {
+		"firstName": "Rob",
+		"lastName": "Grant"
+	  }
+	},
+	{
+	  "title": "Backwards, Red Dwarf",
+	  "author": {
+		"firstName": "Rob",
+		"lastName": "Grant"
+	  }
+	},
+	{
+	  "title": "The Grand Design",
+	  "author": {
+		"firstName": "Stephen",
+		"lastName": "Hawking"
+	  }
+	},
+	{
+	  "title": "The Book of Samson",
+	  "author": {
+		"firstName": "David",
+		"lastName": "Maine"
+	  }
+	},
+	{
+	  "title": "The Preservationist",
+	  "author": {
+		"firstName": "David",
+		"lastName": "Maine"
+	  }
+	},
+	{
+	  "title": "Fallen",
+	  "author": {
+		"firstName": "David",
+		"lastName": "Maine"
+	  }
+	},
+	{
+	  "title": "Monster 1959",
+	  "author": {
+		"firstName": "David",
+		"lastName": "Maine"
+	  }
+	}
+  ] */
+
+const options = {
+	// isCaseSensitive: false,
+	includeScore: true,
+	// shouldSort: true,
+	// includeMatches: false,
+	// findAllMatches: false,
+	// minMatchCharLength: 1,
+	// location: 0,
+	// threshold: 0.6,
+	// distance: 100,
+	// useExtendedSearch: false,
+	// ignoreLocation: false,
+	// ignoreFieldNorm: false,
+	keys: [
+		"nome",
+		"desc",
+		"uso"
+	]
+}
+
+const sucessoCor = "#2AFF00"
+const erroCor = "#FF1B00"
+
+const listaCmds = new Fuse(cmdsArray, options)
+
+client.once('ready', async () => {
 	client.channels.cache.get(canalRegistro).messages.fetch(undefined, true)
 	console.log('Bot Iniciado!')
 })
@@ -23,32 +329,89 @@ client.on('message', message => {
 	try {
 		if (comando == '3') {
 			message.channel.send(new Discord.MessageEmbed()
-					.setTitle(`Select your language | Selecione o seu idioma`)
-					.setDescription('**\nTo begin, select your prefered language with the reactions bellow!\n\nPara começar, selecione o idioma que prefere nas reações abaixo!**')
-					.setColor('#0443C1')
-					.setURL('https://discord.gg/pVTjJT9mXZ')
-					.addFields(
-						{ name: '\u200B', value: '\u200B' },
-						{ name: '**#English**', value: 'Click the 🇺🇸 reaction bellow this message to set your language to English.', inline:true},
-						{ name: '**#Português**', value: 'Clique na reação 🇧🇷 abaixo dessa mensagem para colocar o seu idioma como Português.', inline:true},
-						{ name: '\u200B', value: '\u200B' },
+				.setTitle(`Select your language | Selecione o seu idioma`)
+				.setDescription('**\nTo begin, select your prefered language with the reactions bellow!\n\nPara começar, selecione o idioma que prefere nas reações abaixo!**')
+				.setColor('#0443C1')
+				.setURL('https://discord.gg/pVTjJT9mXZ')
+				.addFields(
+					{ name: '\u200B', value: '\u200B' },
+					{ name: '**#English**', value: 'Click the 🇺🇸 reaction bellow this message to set your language to English.', inline:true},
+					{ name: '**#Português**', value: 'Clique na reação 🇧🇷 abaixo dessa mensagem para colocar o seu idioma como Português.', inline:true},
+					{ name: '\u200B', value: '\u200B' },
 					)
 					.setThumbnail('https://i.imgur.com/aWQ9aBT.png')
 					.setFooter('#Bkr1253 - http://bit.ly/bk-plugins'))
-				.then(message => {
-					message.react('🇺🇸')
-					return message
-				})
-				.then(message => {
-					message.react('🇧🇷')
-					return message
-				})
-				.catch(error => {})
+					.then(message => {
+						message.react('🇺🇸')
+						return message
+					})
+					.then(message => {
+						message.react('🇧🇷')
+						return message
+					})
+					.catch(error => {})
+				} else if (comando == 'help' || comando == 'ajuda' || comando == 'permissao' || comando == 'permission' || comando == 'perm') {
+					const lang = getLanguage(message.member)
+					const comandos = listaCmds.search(args.toString())
+					const isEnglish = lang.name === 'English'
+					
+					let title = isEnglish ? 'Command Help' : 'Ajuda do comando'
+
+					if (comandos.length > 0) {
+						const key = isEnglish ? 0 : 1
+						const comando = comandos[0].item
+
+						let cmdTitle = isEnglish ? `${comando.nome[key][0].toUpperCase() + comando.nome[key].slice(1)} Command` : `Comando ${comando.nome[key][0].toUpperCase() + comando.nome[key].slice(1)}`
+						let desc = isEnglish ? 'Description' : 'Descrição'
+						let usage = isEnglish ? 'Usage' : 'Uso'
+						let perm = isEnglish ? 'Permission' : 'Permissão'
+						let sugested = isEnglish ? 'Similar commands' : 'Comandos similares'
+						let help = isEnglish ? 'help' : 'ajuda'
+
+						message.reply(
+							buildEmbed()
+							.setTitle(title)
+							.addFields(
+								{name: cmdTitle, value: `***Plugin***: *${comando.plugin[key]}*\n***${desc}***: *${comando.desc[key]}*\n***${usage}***: *${comando.uso[key]}*\n***${perm}***: *${comando.perm}*\n\n`},
+							)
+							.setFooter(`${sugested}: \n!${help} ${comandos[1].item.nome[key] || 'null'}   !${help} ${comandos[2].item.nome[key] || 'null'}   !${help} ${comandos[3].item.nome[key]|| 'null'}   !${help} ${comandos[4].item.nome[key]|| 'null'}`)
+						)
+					} else {
+						let n = isEnglish ? 'Command not found' : 'Comando não encontrado'
+						let v = isEnglish ? `The command '${args.toString()}' was not found, try again!` : `O comando '${args.toString()}' não foi encontrado, tente novamente!`
+
+						message.reply(
+							buildEmbed(true)
+							.setTitle(title)
+							.addFields(
+								{name: n, value: v},
+							)
+						)
+					}
+
+		} else if (comando == 'comandos' || comando == 'commands') {
+							
 		}
 	} catch(ignore) {}
 })
 
-const ptMsg = displayName => {
+function buildEmbed(isError) {
+	let cor = isError || false
+	cor = isError ? erroCor : sucessoCor
+
+	return new Discord.MessageEmbed()
+		.setTitle(`Placeholder title`)
+		.setColor(cor)
+		.setURL('https://discord.gg/pVTjJT9mXZ')
+}
+
+function getLanguage(member) {
+	const guild = member.guild
+	return member.roles.cache.some(r => r.name === 'Portugues') ? guild.roles.cache.find(r => r.name === 'Portugues') : 
+		guild.roles.cache.find(r => r.name === 'English')
+}
+
+function ptMsg(displayName) {
 	return new Discord.MessageEmbed()
 		.setTitle(`Bem-vindo(a) ao servidor, @${displayName}!`)
 		.setDescription('Seja bem-vindo(a) ao BkStore, um servidor onde você pode encomendar, comprar, ou receber suporte para meus plugins!')
@@ -69,7 +432,7 @@ const ptMsg = displayName => {
 		.setFooter('#Bkr1253 - Meus plugins: http://bit.ly/bk-plugins')
 }
 
-const engMsg = displayName => {
+function engMsg(displayName) {
 	return new Discord.MessageEmbed()
 		.setTitle(`Welcome to the server, @${displayName}!`)
 		.setDescription('Welcome to BkStore, a server where you can order, buy, or receive support for my plugins!')
