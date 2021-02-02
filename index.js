@@ -9,6 +9,8 @@ client.commands = new Discord.Collection()
 const canalRegistro = '748731824804462702'
 const idBot = '747158660744216678'
 
+// let mutedUsers = require('./muted-users.json')
+
 let cmdsArray = [
 	{
 		"plugin": ["Bkteleport", "BkTeleporte"],
@@ -316,7 +318,19 @@ const listaCmds = new Fuse(cmdsArray, options)
 client.once('ready', async () => {
 	try {
 		client.channels.cache.get(canalRegistro).messages.fetch(undefined, true)
-	} catch(ignored) { }
+		// setInterval(() => {
+		// 	if (mutedUsers.users.length > 0) {
+		// 		mutedUsers.users.forEach(user => {
+		// 			user.hours = user.hours - 1
+		// 			if (user.hours == 0) {
+		// 				delete mutedUsers.users[mutedUsers.users.indexOf(user)]
+		// 				mutedUsers.users = mutedUsers.users.filter(e => e != null)
+		// 			}
+		// 		})
+		// 		fs.writeFileSync('./muted-users.json', JSON.stringify(mutedUsers), 'utf8', () => {console.log(mutedUsers.users)})
+		// 	}
+		// }, 3600000)
+	} catch(error) {console.log(error)}
 	console.log('Bot Iniciado!')
 })
 
@@ -324,10 +338,13 @@ client.login(token)
 
 client.on('message', message => {
 	try {
-		if (!message.content.startsWith(prefix) || message.author.bot) return;
-		
-		const args = message.content.slice(prefix.length).trim().split(/ +/);
-		const comando = args.shift().toLowerCase();
+		if (message.author.bot || !isSafeMessage(message) || !message.content.startsWith(prefix)/* || isMuted(message) */) return
+
+		// mutedUsers.users.push({info:message.member.user, hours: 3})
+		// if (isMuted(message)) return
+
+		const args = message.content.slice(prefix.length).trim().split(/ +/)
+		const comando = args.shift().toLowerCase()
 
 		if (comando == '3') {
 			message.channel.send(new Discord.MessageEmbed()
@@ -351,11 +368,11 @@ client.on('message', message => {
 						message.react('🇧🇷')
 						return message
 					})
-					.catch(error => {})
+					.catch(error => {console.log(error)})
 				} else if (comando == 'help' || comando == 'ajuda' || comando == 'permissao' || comando == 'permission' || comando == 'perm') {
 					const lang = getLanguage(message.member)
-					const comandos = listaCmds.search(args.toString())
 					const isEnglish = lang.name === 'English'
+					const comandos = listaCmds.search(args.toString())
 					
 					let title = isEnglish ? 'Command Help' : 'Ajuda do comando'
 
@@ -372,6 +389,7 @@ client.on('message', message => {
 
 						message.reply(
 							buildEmbed()
+							.setURL('')
 							.setTitle(title)
 							.addFields(
 								{name: cmdTitle, value: `***Plugin***: *${comando.plugin[key]}*\n***${desc}***: *${comando.desc[key]}*\n***${usage}***: *${comando.uso[key]}*\n***${perm}***: *${comando.perm}*\n\n`},
@@ -384,18 +402,191 @@ client.on('message', message => {
 
 						message.reply(
 							buildEmbed(true)
-							.setTitle(title)
-							.addFields(
-								{name: n, value: v},
-							)
+								.setURL('')
+								.setTitle(title)
+								.addFields(
+									{name: n, value: v},
+								)
 						)
 					}
 
 		} else if (comando == 'comandos' || comando == 'commands') {
 							
 		}
-	} catch(ignore) {}
+	} catch(error) {console.log(error)}
 })
+
+// function isMuted(message) {
+// 	mutedUsers.users.forEach(e => {
+// 		if (e.info.id == message.member.user.id) {
+// 			message.member.user.send(
+// 				buildEmbed(true)
+// 					.setTitle('asdasdasdads')
+// 					.setDescription('sdklqoeisdm')
+// 			)
+// 			message.delete()
+// 			return true
+// 		}
+// 	})
+// 	return false
+// }
+
+function isSafeMessage(message) {
+	const cont = [
+		'www.',
+		'.com',
+		'. com',
+		'https://',
+		'https : / /',
+		'http://',
+		'http : / / ',
+		'http:',
+		'http :',
+		'https:',
+		'https : ',
+		'www',
+		'.net',
+		'. net',
+		'.br',
+		'. br',
+		'.com.br',
+		'. com . br',
+		'.gg',
+		'. gg',
+		'discord.gg',
+		'discord . gg',
+		'discord.',
+		'discord .',
+		'discordapp.',
+		'discordapp .',
+		'discordapp.com',
+		'discordapp . com'
+	]
+
+	const links = [
+		{
+		  "valor": "www"
+		},
+		{
+		  "valor": "http"
+		},
+		{
+		  "valor": "https"
+		},
+		{
+		  "valor": "com"
+		},
+		{
+		  "valor": "com br"
+		},
+		{
+		  "valor": "net"
+		},
+		{
+		  "valor": "gg"
+		},
+		{
+		  "valor": "discord gg"
+		},
+		{
+		  "valor": "d1sc0rd4pp  c0m"
+		},
+		{
+		  "valor": "d1sc0rd"
+		},
+		{
+		  "valor": "discordapp com"
+		}/* ,
+		{
+		  "valor": "cu"
+		},
+		{
+		  "valor": "porra"
+		},
+		{
+		  "valor": "foder"
+		},
+		{
+		  "valor": "caralho"
+		},
+		{
+		  "valor": "puta"
+		},
+		{
+		  "valor": "buceta"
+		},
+		{
+		  "valor": "vagabundo"
+		},
+		{
+		  "valor": "vagabunda"
+		} */
+	]
+	const options = {
+		includeScore: true,
+		keys: [
+			"valor"
+		]
+	}
+
+	const lang = getLanguage(message.member)
+	const isEnglish = lang.name === 'English'
+
+	const titulo = isEnglish ? `You can't do that, @${message.author.username}!` : `Você não pode fazer isso, @${message.author.username}!`
+	const desc = isEnglish ? 'A link was detected in your message and you will be punished if you continue to send it.' : 'Um link foi detectado na sua mensagem e você será punido se continuar a envia-lo.'
+	const procurarLink = new Fuse(links, options)
+
+	const notSafe = () => {
+		message.reply(
+			buildEmbed(true)
+				.setURL('')
+				.setTitle(titulo)
+				.setDescription(desc)
+		)
+		// mutedUsers.users.push({info:message.member.user, hours:1})
+		message.delete()
+		return false
+	}
+	
+	let lastSix = ''
+	let lastThree = ''
+	let triggered = false
+
+	for (let c = 0; c < cont.length; c++) {
+		if (message.content.toLowerCase().includes(cont[c])) {
+			return notSafe()
+		}
+	}
+
+	message.content.trim().replace('/', ' ').replace('.', ' ').replace('-', ' ').replace('_', ' ').replace(',', ' ').replace(';', ' ').replace(':', ' ').replace('~', ' ').replace('\'', ' ').replace('\"', ' ').split(/ +/).forEach(word => {
+		word = word.toLowerCase()
+
+		if (word.length == 1) {
+			lastSix += word
+			lastThree += word
+		} else if (!triggered && message.content != 'gg' && word != 'is' && word != 'this' && word != 'app' && word != 'com' && word != 'br' && word != 'come' && word != 'coma' && procurarLink.search(word)[0] != null && procurarLink.search(word)[0].score < 0.34) {
+			triggered = true
+			return notSafe()
+		}
+		
+		if (!triggered && lastSix == 6) {
+			if (procurarLink.search(lastSix)[0] != null && procurarLink.search(lastSix)[0].score < 0.4) {
+				triggered = true
+				return notSafe()
+			}
+			lastSix = ''
+		}
+		
+		if (!triggered && lastThree.length == 3) {
+			if (procurarLink.search(lastThree)[0] != null && procurarLink.search(lastThree)[0].score < 0.4) {
+				triggered = true
+				return notSafe()
+			}
+			lastThree = ''
+		}
+	})
+	return true
+}
 
 function buildEmbed(isError) {
 	let cor = isError || false
@@ -467,10 +658,10 @@ client.on('messageReactionAdd', (reaction, user) => {
 	
 			member.send(emoji.name == '🇺🇸' ? engMsg(member.displayName) : ptMsg(member.displayName))
 				.then(message => message.react('👍'))
-				.catch(error => {})
+				.catch(error => {console.log(error)})
 			member.roles.add(emoji.name == '🇺🇸' ? engRole : ptRole)
 		}
-	} catch(ignored) { }
+	} catch(error) {console.log(error)}
 })
 
 client.on('messageReactionRemove', (reaction, user) => {
@@ -484,34 +675,36 @@ client.on('messageReactionRemove', (reaction, user) => {
 			const engRole = guild.roles.cache.find(r => r.name === 'English')
 			
 			try {
-				user.dmChannel.messages.fetch()
-				.then(messages => {
-					messages.forEach(m => {
-						if (m.author.id === idBot) {
-							msgs.push(m)
-						}
-					})
-					msgs[0].delete()
-	
-					// let toDelete = 0
-	
-					// console.log(member.roles.cache)
-					// console.log(member.roles.cache.some(r => r.name === 'Portugues'))
-	
-					// if ((member.roles.cache.some(r => r.name === 'Portugues') && !member.roles.cache.some(r => r.name === 'English')) || 
-					// 	(member.roles.cache.some(r => r.name === 'English') && !member.roles.cache.some(r => r.name === 'Portugues'))) toDelete = 1
-					// else if (member.roles.cache.some(r => r.name === 'Portugues') && member.roles.cache.some(r => r.name === 'English')) toDelete = 2
-					// while (toDelete > 0) {
-					// 	msgs[0].delete()
-					// 	toDelete -= 1
-					// }
-				})
-				.catch(error => {});
-			} catch (ignored) { }
+				if (user.dmChannel != null) {
+					user.dmChannel.messages.fetch()
+						.then(messages => {
+							messages.forEach(m => {
+								if (m.author.id === idBot) {
+									msgs.push(m)
+								}
+							})
+							msgs[0].delete()
+			
+							// let toDelete = 0
+			
+							// console.log(member.roles.cache)
+							// console.log(member.roles.cache.some(r => r.name === 'Portugues'))
+			
+							// if ((member.roles.cache.some(r => r.name === 'Portugues') && !member.roles.cache.some(r => r.name === 'English')) || 
+							// 	(member.roles.cache.some(r => r.name === 'English') && !member.roles.cache.some(r => r.name === 'Portugues'))) toDelete = 1
+							// else if (member.roles.cache.some(r => r.name === 'Portugues') && member.roles.cache.some(r => r.name === 'English')) toDelete = 2
+							// while (toDelete > 0) {
+							// 	msgs[0].delete()
+							// 	toDelete -= 1
+							// }
+						})
+					.catch(error => {console.log(error)});
+				} 
+			} catch (error) {console.log(error)}
 	
 			let message = reaction.message, emoji = reaction.emoji;
 	
 			guild.member(user).roles.remove(emoji.name == '🇺🇸' ? engRole : ptRole)
 		}
-	} catch(ignored) { }
+	} catch(error) {console.log(error)}
 })
