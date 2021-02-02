@@ -396,6 +396,7 @@ client.on('message', message => {
 							)
 							.setFooter(`${sugested}: \n!${help} ${comandos[1].item.nome[key] || 'null'}   !${help} ${comandos[2].item.nome[key] || 'null'}   !${help} ${comandos[3].item.nome[key]|| 'null'}   !${help} ${comandos[4].item.nome[key]|| 'null'}`)
 						)
+						
 					} else {
 						let n = isEnglish ? 'Command not found' : 'Comando não encontrado'
 						let v = isEnglish ? `The command '${args.toString()}' was not found, try again!` : `O comando '${args.toString()}' não foi encontrado, tente novamente!`
