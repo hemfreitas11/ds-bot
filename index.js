@@ -314,19 +314,21 @@ const erroCor = "#FF1B00"
 const listaCmds = new Fuse(cmdsArray, options)
 
 client.once('ready', async () => {
-	client.channels.cache.get(canalRegistro).messages.fetch(undefined, true)
+	try {
+		client.channels.cache.get(canalRegistro).messages.fetch(undefined, true)
+	} catch(ignored) { }
 	console.log('Bot Iniciado!')
 })
 
 client.login(token)
 
 client.on('message', message => {
-	if (!message.content.startsWith(prefix) || message.author.bot) return;
-	
-	const args = message.content.slice(prefix.length).trim().split(/ +/);
-	const comando = args.shift().toLowerCase();
-	
 	try {
+		if (!message.content.startsWith(prefix) || message.author.bot) return;
+		
+		const args = message.content.slice(prefix.length).trim().split(/ +/);
+		const comando = args.shift().toLowerCase();
+
 		if (comando == '3') {
 			message.channel.send(new Discord.MessageEmbed()
 				.setTitle(`Select your language | Selecione o seu idioma`)
@@ -454,58 +456,62 @@ function engMsg(displayName) {
 }
 
 client.on('messageReactionAdd', (reaction, user) => {
-	if (!user.bot) {
-		let message = reaction.message, emoji = reaction.emoji;
-		const guild = message.guild
-		const member = guild.member(user)
-		
-		const ptRole = guild.roles.cache.find(r => r.name === 'Portugues')
-		const engRole = guild.roles.cache.find(r => r.name === 'English')
-
-		member.send(emoji.name == '🇺🇸' ? engMsg(member.displayName) : ptMsg(member.displayName))
-			.then(message => message.react('👍'))
-			.catch(error => {})
-		member.roles.add(emoji.name == '🇺🇸' ? engRole : ptRole)
-	}
+	try {
+		if (!user.bot) {
+			let message = reaction.message, emoji = reaction.emoji;
+			const guild = message.guild
+			const member = guild.member(user)
+			
+			const ptRole = guild.roles.cache.find(r => r.name === 'Portugues')
+			const engRole = guild.roles.cache.find(r => r.name === 'English')
+	
+			member.send(emoji.name == '🇺🇸' ? engMsg(member.displayName) : ptMsg(member.displayName))
+				.then(message => message.react('👍'))
+				.catch(error => {})
+			member.roles.add(emoji.name == '🇺🇸' ? engRole : ptRole)
+		}
+	} catch(ignored) { }
 })
 
 client.on('messageReactionRemove', (reaction, user) => {
-	if (!user.bot) {
-		const msgs = []
-		// const member = reaction.message.guild.member(user)
-		
-		const guild = reaction.message.guild
-		const ptRole = guild.roles.cache.find(r => r.name === 'Portugues')
-		const engRole = guild.roles.cache.find(r => r.name === 'English')
-		
-		try {
-			user.dmChannel.messages.fetch()
-			.then(messages => {
-				messages.forEach(m => {
-					if (m.author.id === idBot) {
-						msgs.push(m)
-					}
+	try {
+		if (!user.bot) {
+			const msgs = []
+			// const member = reaction.message.guild.member(user)
+			
+			const guild = reaction.message.guild
+			const ptRole = guild.roles.cache.find(r => r.name === 'Portugues')
+			const engRole = guild.roles.cache.find(r => r.name === 'English')
+			
+			try {
+				user.dmChannel.messages.fetch()
+				.then(messages => {
+					messages.forEach(m => {
+						if (m.author.id === idBot) {
+							msgs.push(m)
+						}
+					})
+					msgs[0].delete()
+	
+					// let toDelete = 0
+	
+					// console.log(member.roles.cache)
+					// console.log(member.roles.cache.some(r => r.name === 'Portugues'))
+	
+					// if ((member.roles.cache.some(r => r.name === 'Portugues') && !member.roles.cache.some(r => r.name === 'English')) || 
+					// 	(member.roles.cache.some(r => r.name === 'English') && !member.roles.cache.some(r => r.name === 'Portugues'))) toDelete = 1
+					// else if (member.roles.cache.some(r => r.name === 'Portugues') && member.roles.cache.some(r => r.name === 'English')) toDelete = 2
+					// while (toDelete > 0) {
+					// 	msgs[0].delete()
+					// 	toDelete -= 1
+					// }
 				})
-				msgs[0].delete()
-
-				// let toDelete = 0
-
-				// console.log(member.roles.cache)
-				// console.log(member.roles.cache.some(r => r.name === 'Portugues'))
-
-				// if ((member.roles.cache.some(r => r.name === 'Portugues') && !member.roles.cache.some(r => r.name === 'English')) || 
-				// 	(member.roles.cache.some(r => r.name === 'English') && !member.roles.cache.some(r => r.name === 'Portugues'))) toDelete = 1
-				// else if (member.roles.cache.some(r => r.name === 'Portugues') && member.roles.cache.some(r => r.name === 'English')) toDelete = 2
-				// while (toDelete > 0) {
-				// 	msgs[0].delete()
-				// 	toDelete -= 1
-				// }
-			})
-			.catch(error => {});
-		} catch (ignored) { }
-
-		let message = reaction.message, emoji = reaction.emoji;
-
-		guild.member(user).roles.remove(emoji.name == '🇺🇸' ? engRole : ptRole)
-	}
+				.catch(error => {});
+			} catch (ignored) { }
+	
+			let message = reaction.message, emoji = reaction.emoji;
+	
+			guild.member(user).roles.remove(emoji.name == '🇺🇸' ? engRole : ptRole)
+		}
+	} catch(ignored) { }
 })
