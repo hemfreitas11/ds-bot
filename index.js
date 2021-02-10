@@ -9,8 +9,6 @@ client.commands = new Discord.Collection()
 const canalRegistro = '748731824804462702'
 const idBot = '747158660744216678'
 
-const shopUpdateChannelID = 
-
 // let mutedUsers = require('./muted-users.json')
 
 let cmdsArray = [
