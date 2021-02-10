@@ -556,7 +556,7 @@ function isSafeMessage(message) {
 
 	const titulo = isEnglish ? `You can't do that, @${message.author.username}!` : `Você não pode fazer isso, @${message.author.username}!`
 	const desc = isEnglish ? 'A link was detected in your message and you will be punished if you continue to send it.' : 'Um link foi detectado na sua mensagem e você será punido se continuar a envia-lo.'
-	const procurarLink = new Fuse(links, options)
+	//const procurarLink = new Fuse(links, options)
 
 	const notSafe = () => {
 		message.reply(
