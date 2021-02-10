@@ -9,6 +9,8 @@ client.commands = new Discord.Collection()
 const canalRegistro = '748731824804462702'
 const idBot = '747158660744216678'
 
+const shopUpdateChannelID = 
+
 // let mutedUsers = require('./muted-users.json')
 
 let cmdsArray = [
@@ -485,7 +487,7 @@ function isSafeMessage(message) {
 		'discordapp . com'
 	]
 
-	const links = [
+	/* const links = [
 		{
 		  "valor": "www"
 		},
@@ -518,7 +520,7 @@ function isSafeMessage(message) {
 		},
 		{
 		  "valor": "discordapp com"
-		}/* ,
+		},
 		{
 		  "valor": "cu"
 		},
@@ -542,14 +544,14 @@ function isSafeMessage(message) {
 		},
 		{
 		  "valor": "vagabunda"
-		} */
+		}
 	]
 	const options = {
 		includeScore: true,
 		keys: [
 			"valor"
 		]
-	}
+	} */
 
 	const lang = getLanguage(message.member)
 	const isEnglish = lang.name === 'English'
@@ -570,9 +572,9 @@ function isSafeMessage(message) {
 		return false
 	}
 	
-	let lastSix = ''
+/* 	let lastSix = ''
 	let lastThree = ''
-	let triggered = false
+	let triggered = false */
 
 	for (let c = 0; c < cont.length; c++) {
 		if (message.content.toLowerCase().includes(cont[c])) {
@@ -580,7 +582,7 @@ function isSafeMessage(message) {
 		}
 	}
 
-	message.content.trim().replace('/', ' ').replace('.', ' ').replace('-', ' ').replace('_', ' ').replace(',', ' ').replace(';', ' ').replace(':', ' ').replace('~', ' ').replace('\'', ' ').replace('\"', ' ').split(/ +/).forEach(word => {
+	/* message.content.trim().replace('/', ' ').replace('.', ' ').replace('-', ' ').replace('_', ' ').replace(',', ' ').replace(';', ' ').replace(':', ' ').replace('~', ' ').replace('\'', ' ').replace('\"', ' ').split(/ +/).forEach(word => {
 		word = word.toLowerCase()
 
 		if (word.length == 1) {
@@ -606,7 +608,7 @@ function isSafeMessage(message) {
 			}
 			lastThree = ''
 		}
-	})
+	}) */
 	return true
 }
 
