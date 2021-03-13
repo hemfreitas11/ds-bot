@@ -35,24 +35,24 @@ let cmdsArray = [
 	},
 	{
 		"plugin": ["Bkteleport", "BkTeleporte"],
-		"nome": ["tphere", "tpaqui"],
+		"nome": ["tpahere", "tpaqui"],
 		"desc": ["Asks another player to teleport to you.", "Pede que outro jogador teleporte ate voce."],
-		"uso": ["/tphere <player>", "/tpaqui <jogador>"],
-		"perm": "bkteleport.tphere"
+		"uso": ["/tpahere <player>", "/tpaqui <jogador>"],
+		"perm": "bkteleport.tpahere"
 	},
 	{
 		"plugin": ["Bkteleport", "BkTeleporte"],
 		"nome": ["tpaccept", "tpaceitar"],
 		"desc": ["Accepts a teleport request", "Aceita o pedido de teleporte recebido"],
 		"uso": ["/tpaccept <player>", "/tpaceitar <jogador>"],
-		"perm": "N/A"
+		"perm": "bkteleport.tpaccept"
 	},
 	{
 		"plugin": ["Bkteleport", "BkTeleporte"],
 		"nome": ["tpdeny", "tpnegar"],
 		"desc": ["Declines a teleport request", "Recusa o pedido de teleporte recebido"],
 		"uso": ["/tpdeny <player>", "/tpnegar <jogador>"],
-		"perm": "N/A"
+		"perm": "bkteleport.tpdeny"
 	},
 	{
 		"plugin": ["Bkteleport", "BkTeleporte"],
@@ -108,7 +108,7 @@ let cmdsArray = [
 		"nome": ["shops", "lojas"],
 		"desc": ["Opens a list of all the shops available", "Abre uma lista das lojas disponíveis"],
 		"uso": ["/shops", "/lojas"],
-		"perm": "N/A"
+		"perm": "bkshop.shops"
 	},
 	{
 		"plugin": ["BkShop", "BkLoja"],
@@ -390,6 +390,33 @@ client.on('message', message => {
 						return message
 					})
 					.catch(error => {console.log(error)})
+				} else if (comando == 'bug') {
+					const lang = getLanguage(message.member)
+					const isEnglish = lang.name === 'English'
+					
+					let title = isEnglish ? 'How To Report A Bug' : 'Como Reportar Um Bug'
+					
+					let titl = isEnglish ? `Hi there, i'm here to help!` : `Olá, eu estou aqui para ajudar!`
+					let cmdTitle = isEnglish ? `To ensure the problem is properly described, plese fill the form bellow with the details of the bug.` : `Para garantir que o problema seja descrito de forma correta, preencha o formulário abaixo com os detalhes do bug.`
+					let desc = isEnglish ? 'Short description of the problem' : 'Pequena descrição do problema'
+					let usage = isEnglish ? 'Did you try to do anything to fix it? If yes, what?' : 'Você tentou fazer algo para arrumar o bug? Se sim, o que?'
+					let perm = isEnglish ? 'Do you use any of my other plugins? If yes, which one?' : 'Você usa algum dos meus outros plugins? Se sim, qual?'
+					let help = isEnglish ? 'Was there an error in the console? If yes, send a screenshot of it' : 'Teve algum erro no console? Se sim, mande uma foto dele'
+
+					message.reply(
+						buildEmbed()
+						.setURL('')
+						.addFields(
+							{ name: '\u200b', value: '\u200b'},
+							{ name: titl, value: cmdTitle},
+							{ name: '\u200b', value: '\u200b'},
+							{ name: '\u200b', value: `\n\n\n**Plugin**:\n**${desc}**:\n**${usage}**:\n**${perm}**:\n**${help}**:`}
+						)
+						.setTitle(title)
+						.setThumbnail('https://i.imgur.com/aWQ9aBT.png')
+					)
+					
+
 				} else if (comando == 'help' || comando == 'ajuda' || comando == 'permissao' || comando == 'permission' || comando == 'perm') {
 					const lang = getLanguage(message.member)
 					const isEnglish = lang.name === 'English'
@@ -455,7 +482,7 @@ client.on('message', message => {
 
 function isSafeMessage(message) {
 	const cont = [
-		'www.',
+		/* 'www.',
 		'.com',
 		'. com',
 		'https://',
@@ -474,13 +501,13 @@ function isSafeMessage(message) {
 		'.com.br',
 		'. com . br',
 		'.gg',
-		'. gg',
+		'. gg', */
 		'discord.gg',
 		'discord . gg',
-		'discord.',
+		/* 'discord.',
 		'discord .',
 		'discordapp.',
-		'discordapp .',
+		'discordapp .', */
 		'discordapp.com',
 		'discordapp . com'
 	]
@@ -634,7 +661,7 @@ function ptMsg(displayName) {
 		.setURL('https://discord.gg/pVTjJT9mXZ')
 		.addFields(
 			{ name: '\u200B', value: '\u200B' },
-			{ name: 'Suporte para Erros', value: 'Poste o seu problema no canal #Erros do plugin em que você deseja receber ajuda.'},
+			{ name: 'Suporte para Erros', value: 'Poste o seu problema no canal #Bugs do plugin em que você deseja receber ajuda.'},
 			{ name: '\u200B', value: '\u200B' },
 			{ name: 'Sugestões são sempre bem-vindas', value: 'Deixe suas sugestões sobre o que eu posso melhorar nos plugins no canal #Sugestões.'},
 			{ name: '\u200B', value: '\u200B' },
@@ -655,7 +682,7 @@ function engMsg(displayName) {
 		.setURL('https://discord.gg/pVTjJT9mXZ')
 		.addFields(
 			{ name: '\u200B', value: '\u200B' },
-			{ name: 'Error Support', value: 'Post you problem in the #Errors channel from the plugin you wish to receive help for.'},
+			{ name: 'Error Support', value: 'Post you problem in the #Bugs channel from the plugin you wish to receive help for.'},
 			{ name: '\u200B', value: '\u200B' },
 			{ name: 'Sugestions are always welcome', value: 'Leave your sugestions about what i can improve in the #Sugestions channel.'},
 			{ name: '\u200B', value: '\u200B' },
