@@ -338,7 +338,7 @@ client.once('ready', async () => {
 				})
 				status = true
 			}
-		}, 4000);
+		}, 4500);
 		// setInterval(() => {
 		// 	if (mutedUsers.users.length > 0) {
 		// 		mutedUsers.users.forEach(user => {
