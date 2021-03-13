@@ -323,11 +323,13 @@ client.once('ready', async () => {
 		
 		let prevNum = 0
 		let ale = 0
+		let cmdSize = 
 
 		setInterval(() => {
-			while (ale == prevNum) ale = Math.floor(Math.random()*14)
+			while (ale == prevNum) ale = Math.floor(Math.random()*cmdsArray.length)
 			prevNum = ale
 			if (status){ 
+				console.log(ale)
 				client.user.setActivity(`!help ${cmdsArray[ale].nome[0]}`, {
 					type: 'PLAYING'
 				})
@@ -338,7 +340,7 @@ client.once('ready', async () => {
 				})
 				status = true
 			}
-		}, 4500);
+		}, 4000);
 		// setInterval(() => {
 		// 	if (mutedUsers.users.length > 0) {
 		// 		mutedUsers.users.forEach(user => {
