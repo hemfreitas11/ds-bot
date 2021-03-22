@@ -365,6 +365,8 @@ client.once('ready', async () => {
 	console.log('Bot Iniciado!')
 	
 	app.post('/test', (req, res) => {
+		console.log(allowedIps.ips)
+		console.log(req.socket.address().address)
 		const clientIp = req.socket.address().address
 		if (allowedIps.ips.includes(clientIp)) {
 			res.send({resp: "true"})
