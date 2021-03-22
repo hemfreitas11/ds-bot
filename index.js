@@ -416,20 +416,40 @@ client.on('message', message => {
 					})
 					.catch(error => {console.log(error)})
 				} else if (comando == 'ativar') {
-					
-					allowedIps.ips.concat('172.16.243.114')
-					fs.writeFile('./allowed-ips.json', JSON.stringify(allowedIps), 'utf8', () => {console.log(allowedIps.ips)})
-					allowedIps = require('./allowed-ips.json')
-					message.reply(allowedIps.ips)
+					if (args.length == 1) {
+						let ip = args[0]
+
+						let index = allowedIps.ips.indexOf(ip)
+						if (index == -1) {
+							allowedIps.ips.push(ip)
+							fs.writeFile('./allowed-ips.json', JSON.stringify(allowedIps), 'utf8', () => {})
+							
+							message.reply(buildEmbed(false).setTitle('Sucesso').setURL('').setDescription('IP ativado com sucesso.'))
+						} else {
+							message.reply(buildEmbed(true).setTitle('IP inválido').setURL('').setDescription('O IP informado já foi ativado.'))
+						}
+						
+						message.reply(allowedIps.ips)
+					} else {
+						message.reply(buildEmbed(true).setTitle('Erro de sintaxe').setURL('').setDescription('IP não informado.'))
+					}
 					
 				} else if (comando == 'desativar') {
-
-					let index = allowedIps.ips.indexOf('172.16.243.114')
-					if (index !== -1) { allowedIps.ips.splice(index, 1) }
-					fs.writeFile('./allowed-ips.json', JSON.stringify(allowedIps), 'utf8', () => {console.log(allowedIps.ips)})
-					allowedIps = require('./allowed-ips.json')
-					message.reply(allowedIps.ips)
-
+					if (args.length == 1) {
+						let ip = args[0]
+						
+						let index = allowedIps.ips.indexOf(ip)
+						if (index !== -1) { 
+							allowedIps.ips.splice(index, 1) 
+							fs.writeFile('./allowed-ips.json', JSON.stringify(allowedIps), 'utf8', () => {})
+							message.reply(buildEmbed(false).setTitle('Sucesso').setURL('').setDescription('IP desativado com sucesso.'))
+						} else {
+							message.reply(buildEmbed(true).setTitle('IP inválido').setURL('').setDescription('O IP informado não está ativado.'))
+						}
+						message.reply(allowedIps.ips)	
+					} else {
+						message.reply(buildEmbed(true).setTitle('Erro de sintaxe').setURL('').setDescription('Ip não informado.'))
+					}
 				} else if (comando == 'bug') {
 					const lang = getLanguage(message.member)
 					const isEnglish = lang.name === 'English'
