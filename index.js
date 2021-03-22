@@ -376,7 +376,7 @@ client.once('ready', async () => {
 		}
 	})
 
-	app.listen(8080, () => {
+	app.listen(process.env.PORT, () => {
 		console.log('Servidor Ligado')
 	})
 })
