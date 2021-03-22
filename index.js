@@ -1,3 +1,15 @@
+const bodyParser = require('body-parser')
+const express = require('express')
+const app = express()
+
+app.use(express.static('.'))
+app.use(bodyParser.urlencoded({extended: true}))
+app.use(bodyParser.json())
+
+const allowedIps = [
+	"000.000.000.000"
+]
+
 const Discord = require('discord.js')
 const Fuse = require('fuse.js')
 const fs = require('fs')
@@ -323,13 +335,11 @@ client.once('ready', async () => {
 		
 		let prevNum = 0
 		let ale = 0
-		let cmdSize = 
 
 		setInterval(() => {
 			while (ale == prevNum) ale = Math.floor(Math.random()*cmdsArray.length)
 			prevNum = ale
-			if (status){ 
-				console.log(ale)
+			if (status) { 
 				client.user.setActivity(`!help ${cmdsArray[ale].nome[0]}`, {
 					type: 'PLAYING'
 				})
@@ -355,6 +365,20 @@ client.once('ready', async () => {
 		// }, 3600000)
 	} catch(error) {console.log(error)}
 	console.log('Bot Iniciado!')
+	
+	app.post('/test', (req, res) => {
+		const clientIp = req.body.ip
+		console.log(req.socket.address())
+		if (allowedIps.includes(clientIp)) {
+			res.send({resp: "true"})
+		} else {
+			res.send({resp: "false"})
+		}
+	})
+
+	app.listen(8080, () => {
+		console.log('Servidor Ligado')
+	})
 })
 
 client.login(token)
