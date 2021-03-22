@@ -371,6 +371,7 @@ client.once('ready', async () => {
 		} else {
 			res.send({resp: "false"})
 		}
+		
 	})
 
 	app.listen(process.env.PORT, '0.0.0.0', () => {
