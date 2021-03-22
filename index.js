@@ -365,7 +365,10 @@ client.once('ready', async () => {
 	console.log('Bot Iniciado!')
 	
 	app.get('/test', (req, res) => {
-		console.log(allowedIps.ips)
+		console.log(req.headers)
+		console.log(req.header())
+
+		/* console.log(allowedIps.ips)
 		console.log('adress', req.socket.address())
 		console.log('localadress', req.socket.localAddress)
 		console.log('remoteadress', req.socket.remoteAddress)
@@ -375,7 +378,7 @@ client.once('ready', async () => {
 		console.log('ip', req.ip)
 		console.log('route', req.route)
 		console.log('subdomains', req.subdomains)
-		console.log('url', req.url)
+		console.log('url', req.url) */
 		const clientIp = req.socket.address().address
 		if (allowedIps.ips.includes(clientIp)) {
 			res.send({resp: "true"})
