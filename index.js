@@ -6,9 +6,7 @@ app.use(express.static('.'))
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(bodyParser.json())
 
-const allowedIps = [
-	"000.000.000.000"
-]
+const {ips} =  require('./allowed-ips.json')
 
 const Discord = require('discord.js')
 const Fuse = require('fuse.js')
@@ -368,7 +366,7 @@ client.once('ready', async () => {
 	
 	app.post('/test', (req, res) => {
 		const clientIp = req.socket.address().address
-		if (allowedIps.includes(clientIp)) {
+		if (ips.includes(clientIp)) {
 			res.send({resp: "true"})
 		} else {
 			res.send({resp: "false"})
@@ -378,6 +376,7 @@ client.once('ready', async () => {
 	app.listen(process.env.PORT, '0.0.0.0', () => {
 		console.log('Servidor Ligado')
 	})
+	console.log(ips)
 })
 
 client.login(token)
@@ -415,6 +414,12 @@ client.on('message', message => {
 						return message
 					})
 					.catch(error => {console.log(error)})
+				} else if (comando == 'ativar') {
+					ips.concat('172.16.243.114')
+					fs.writeFileSync('./allowed-ips.json', JSON.stringify(ips), 'utf8', () => {console.log(ips)})
+				} else if (comando == 'desativar') {
+					ips.remove('172.16.243.114')
+					fs.writeFileSync('./allowed-ips.json', JSON.stringify(ips), 'utf8', () => {console.log(ips)})
 				} else if (comando == 'bug') {
 					const lang = getLanguage(message.member)
 					const isEnglish = lang.name === 'English'
