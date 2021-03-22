@@ -422,7 +422,7 @@ client.on('message', message => {
 						let index = allowedIps.ips.indexOf(ip)
 						if (index == -1) {
 							allowedIps.ips.push(ip)
-							fs.writeFile('./allowed-ips.json', JSON.stringify(allowedIps), 'utf8', () => {})
+							fs.writeFile(`${__dirname}/allowed-ips.json`, JSON.stringify(allowedIps), 'utf8', () => {})
 							
 							message.reply(buildEmbed(false).setTitle('Sucesso').setURL('').setDescription('IP ativado com sucesso.'))
 						} else {
@@ -441,7 +441,7 @@ client.on('message', message => {
 						let index = allowedIps.ips.indexOf(ip)
 						if (index !== -1) { 
 							allowedIps.ips.splice(index, 1) 
-							fs.writeFile('./allowed-ips.json', JSON.stringify(allowedIps), 'utf8', () => {})
+							fs.writeFile(`${__dirname}/allowed-ips.json`, JSON.stringify(allowedIps), 'utf8', () => {})
 							message.reply(buildEmbed(false).setTitle('Sucesso').setURL('').setDescription('IP desativado com sucesso.'))
 						} else {
 							message.reply(buildEmbed(true).setTitle('IP inválido').setURL('').setDescription('O IP informado não está ativado.'))
