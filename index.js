@@ -1,11 +1,32 @@
 const bodyParser = require('body-parser')
 const express = require('express')
 const app = express()
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
-const MongoClient = require('mongodb').MongoClient;
-const uri = process.env.MONGODB_URI;
-const mongoClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-let collection = ''
+const usuarioRegistrado = new Schema({
+	plugin: {
+		type: String,
+		required: true
+	},
+	userID: {
+		type: String,
+		required: true
+	},
+	allowedIP: {
+		type: String,
+		required: true
+	}
+})
+
+const UserRegistrado = mongoose.model('allowedIps', usuarioRegistrado)
+
+// const MongoClient = require('mongodb').MongoClient;
+const uri = "mongodb+srv://bkstore:u7J5XauhQSfLG4@cluster0.whtpt.mongodb.net/allowedIps?retryWrites=true&w=majority"/* process.env.MONGODB_URI */;
+
+
+// const mongoClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+// let collection = ''
 
 app.use(express.static('.'))
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -370,26 +391,35 @@ client.once('ready', async () => {
 		// }, 3600000)
 	} catch (error) { console.log(error) }
 	console.log('Bot Iniciado!')
-
-	app.get('/test', (req, res) => {
-		const clientIp = req.headers['x-forwarded-for']
-		if (allowedIps.ips.includes(clientIp)) {
-			res.send({ resp: "true" })
-		} else {
-			res.send({ resp: "false" })
-		}
-
+	
+	mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+	.then(result => {
+		app.get('/test', (req, res) => {
+			const clientIp = req.headers['x-forwarded-for']
+			UserRegistrado.find()
+				.then(mongoUsers => mongoUsers.filter(userRegistrado => userRegistrado.allowedIP == clientIp))
+				.then(registros => registros.filter(registro => registro.plugin == "BkX1"))
+				.then(registroArray => {
+					if (registroArray[0] !== undefined) {
+						res.send({ resp: "true" })
+					} else {
+						res.send({ resp: "false" })
+					}
+				})
+		})
+		app.listen(process.env.PORT, '0.0.0.0', () => {
+			// mongoClient.connect(err => {
+			// 	collection = mongoClient.db("allowedIps").collection("allowedIps");
+			// 	// perform actions on the collection object
+			// 	mongoClient.close();
+			// });
+			console.log('Backend Ligado')
+		})
+		console.log('Banco de Dados Conectado')
 	})
-
-	app.listen(process.env.PORT, '0.0.0.0', () => {
-		mongoClient.connect(err => {
-			collection = mongoClient.db("allowedIps").collection("allowedIps");
-			// perform actions on the collection object
-			mongoClient.close();
-		});
-		console.log('Servidor Ligado')
-	})
+	.catch(err => {console.log(err)})
 	console.log(allowedIps.ips)
+
 })
 
 client.login(token)
@@ -427,11 +457,43 @@ client.on('message', message => {
 					return message
 				})
 				.catch(error => { console.log(error) })
-		} else if (comando == 'ativar') {
-			if (args.length == 1) {
-				let ip = args[0]
+		} else if (comando == 'autorizar') {
+			if (args.length == 2) {
+				
+				let pl = args[0]
+				let ip = args[1]
+				
+				UserRegistrado.find()
+					.then(mongoUsers => mongoUsers.filter(userRegistrado => userRegistrado.userID == message.member.user.id))
+					.then(registros => registros.filter(registro => registro.plugin == pl))
+					.then(registroArray => {
+						if (registroArray[0] === undefined) {
+							const regUser = new UserRegistrado({
+								plugin: pl,
+								userID: message.member.user.id,
+								allowedIP: ip
+							})
+							regUser.save()
+								.then(result => {message.reply(buildEmbed(false).setTitle('Sucesso').setURL('').setDescription(`Você autorizou o ip **${ip}** no plugin **${pl}** com sucesso!`))})
+								.catch(err => {message.reply(buildEmbed(true).setTitle('Erro Inexperado, entre em contato com **Bkr#1253**').setURL('').setDescription(err))})
+						} else {
+							registroArray[0].remove()
+								.then(result => {
+									const regUser = new UserRegistrado({
+										plugin: pl,
+										userID: message.member.user.id,
+										allowedIP: ip
+									})
+									regUser.save()
+										.then(result => {message.reply(buildEmbed(false).setTitle('Sucesso').setURL('').setDescription(`Você autorizou o ip **${ip}** no plugin **${pl}** com sucesso!`))})
+										.catch(err => {message.reply(buildEmbed(true).setTitle('Erro Inexperado, entre em contato com **Bkr#1253**').setURL('').setDescription(err))})
+								})
+								.catch(err => console.log(err))
+						}
+					})
+					.catch(err => message.reply(err))
 
-				let index = allowedIps.ips.indexOf(ip)
+				/* let index = allowedIps.ips.indexOf(ip)
 				if (index == -1) {
 					allowedIps.ips.push(ip)
 					fs.writeFile(`${__dirname}/allowed-ips.json`, JSON.stringify(allowedIps), 'utf8', () => { })
@@ -441,16 +503,31 @@ client.on('message', message => {
 					message.reply(buildEmbed(true).setTitle('IP inválido').setURL('').setDescription('O IP informado já foi ativado.'))
 				}
 
-				message.reply(allowedIps.ips)
+				message.reply(allowedIps.ips) */
+			} else if (args.length == 1) {
+				message.reply(buildEmbed(true).setTitle('Erro de sintaxe').setURL('').setDescription('Você não informou o IP.'))
 			} else {
-				message.reply(buildEmbed(true).setTitle('Erro de sintaxe').setURL('').setDescription('IP não informado.'))
+				message.reply(buildEmbed(true).setTitle('Erro de sintaxe').setURL('').setDescription('Use !autorizar <Plugin> <Ip>'))
 			}
-
-		} else if (comando == 'desativar') {
+	
+		} else if (comando == 'desautorizar') {
 			if (args.length == 1) {
-				let ip = args[0]
+				let pl = args[0]
+				UserRegistrado.find()
+					.then(mongoUsers => mongoUsers.filter(userRegistrado => userRegistrado.userID == message.member.user.id))
+					.then(registros => registros.filter(registro => registro.plugin == pl))
+					.then(registroArray => {
+						if (registroArray[0] === undefined) {
+							message.reply(buildEmbed(true).setTitle('Erro').setURL('').setDescription(`Você não tem uma autorização no plugin **${pl}**`))
+						} else {
+							const ip = registroArray[0].allowedIP
+							registroArray[0].remove()
+							message.reply(buildEmbed(false).setTitle('Sucesso').setURL('').setDescription(`Você retirou a sua atorização do ip **${ip}** no plugin **${pl}**`))
+						}
+					})
+					.catch(err => message.reply(err))
 
-				let index = allowedIps.ips.indexOf(ip)
+				/* let index = allowedIps.ips.indexOf(ip)
 				if (index !== -1) {
 					allowedIps.ips.splice(index, 1)
 					fs.writeFile(`${__dirname}/allowed-ips.json`, JSON.stringify(allowedIps), 'utf8', () => { })
@@ -458,10 +535,11 @@ client.on('message', message => {
 				} else {
 					message.reply(buildEmbed(true).setTitle('IP inválido').setURL('').setDescription('O IP informado não está ativado.'))
 				}
-				message.reply(allowedIps.ips)
+				message.reply(allowedIps.ips) */
 			} else {
-				message.reply(buildEmbed(true).setTitle('Erro de sintaxe').setURL('').setDescription('Ip não informado.'))
+				message.reply(buildEmbed(true).setTitle('Erro de sintaxe').setURL('').setDescription('Você não informou o nome do Plugin que deseja desautorizar.'))
 			}
+			
 		} else if (comando == 'bug') {
 			const lang = getLanguage(message.member)
 			const isEnglish = lang.name === 'English'
@@ -529,7 +607,6 @@ client.on('message', message => {
 						)
 				)
 			}
-
 		} else if (comando == 'comandos' || comando == 'commands') {
 
 		}
