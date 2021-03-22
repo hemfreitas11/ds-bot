@@ -6,7 +6,7 @@ app.use(express.static('.'))
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(bodyParser.json())
 
-const {ips} =  require('./allowed-ips.json')
+const allowedIps =  require('./allowed-ips.json')
 
 const Discord = require('discord.js')
 const Fuse = require('fuse.js')
@@ -366,7 +366,7 @@ client.once('ready', async () => {
 	
 	app.post('/test', (req, res) => {
 		const clientIp = req.socket.address().address
-		if (ips.includes(clientIp)) {
+		if (allowedIps.ips.includes(clientIp)) {
 			res.send({resp: "true"})
 		} else {
 			res.send({resp: "false"})
@@ -376,7 +376,7 @@ client.once('ready', async () => {
 	app.listen(process.env.PORT, '0.0.0.0', () => {
 		console.log('Servidor Ligado')
 	})
-	console.log(ips)
+	console.log(allowedIps.ips)
 })
 
 client.login(token)
@@ -415,14 +415,14 @@ client.on('message', message => {
 					})
 					.catch(error => {console.log(error)})
 				} else if (comando == 'ativar') {
-					ips.concat('172.16.243.114')
-					fs.writeFileSync('./allowed-ips.json', JSON.stringify(ips), 'utf8', () => {console.log(ips)})
-					message.reply(ips)
+					allowedIps.ips.concat('172.16.243.114')
+					fs.writeFileSync('./allowed-ips.json', JSON.stringify(allowedIps), 'utf8', () => {console.log(allowedIps.ips)})
+					message.reply(allowedIps.ips)
 				} else if (comando == 'desativar') {
-					let index = ips.indexOf('172.16.243.114')
-					if (index !== -1) { ips.splice(index, 1) }
-					fs.writeFileSync('./allowed-ips.json', JSON.stringify(ips), 'utf8', () => {console.log(ips)})
-					message.reply(ips)
+					let index = allowedIps.ips.indexOf('172.16.243.114')
+					if (index !== -1) { allowedIps.ips.splice(index, 1) }
+					fs.writeFileSync('./allowed-ips.json', JSON.stringify(allowedIps), 'utf8', () => {console.log(allowedIps.ips)})
+					message.reply(allowedIps.ips)
 				} else if (comando == 'bug') {
 					const lang = getLanguage(message.member)
 					const isEnglish = lang.name === 'English'
@@ -448,7 +448,6 @@ client.on('message', message => {
 						.setTitle(title)
 						.setThumbnail('https://i.imgur.com/aWQ9aBT.png')
 					)
-					
 
 				} else if (comando == 'help' || comando == 'ajuda' || comando == 'permissao' || comando == 'permission' || comando == 'perm') {
 					const lang = getLanguage(message.member)
