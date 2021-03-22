@@ -2,10 +2,10 @@ const bodyParser = require('body-parser')
 const express = require('express')
 const app = express()
 
-const MongoClient = require('mongodb').MongoClient;
+/* const MongoClient = require('mongodb').MongoClient;
 const uri = "mongodb+srv://bkstore:u7J5XauhQSfLG4@cluster0.whtpt.mongodb.net/allowedIps?retryWrites=true&w=majority";
 const mongoClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-let collection = ''
+let collection = '' */
 
 app.use(express.static('.'))
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -382,11 +382,12 @@ client.once('ready', async () => {
 	})
 
 	app.listen(process.env.PORT, '0.0.0.0', () => {
-		mongoClient.connect(err => {
+		/* mongoClient.connect(err => {
 			collection = mongoClient.db("allowedIps").collection("allowedIps");
 			// perform actions on the collection object
 			mongoClient.close();
-		});
+		}); */
+		console.log(process.env.MONGODB_URI)
 		console.log('Servidor Ligado')
 	})
 	console.log(allowedIps.ips)
