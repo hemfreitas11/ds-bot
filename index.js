@@ -366,7 +366,16 @@ client.once('ready', async () => {
 	
 	app.post('/test', (req, res) => {
 		console.log(allowedIps.ips)
-		console.log(req.ip)
+		console.log('adress', req.socket.address())
+		console.log('localadress', req.socket.localAddress)
+		console.log('remoteadress', req.socket.remoteAddress)
+		console.log('ips', req.ips)
+		console.log('is', req.is())
+		console.log('hostname', req.hostname)
+		console.log('ip', req.ip)
+		console.log('route', req.route)
+		console.log('subdomains', req.subdomains)
+		console.log('url', req.url)
 		const clientIp = req.socket.address().address
 		if (allowedIps.ips.includes(clientIp)) {
 			res.send({resp: "true"})
