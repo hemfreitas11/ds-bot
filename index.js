@@ -365,21 +365,7 @@ client.once('ready', async () => {
 	console.log('Bot Iniciado!')
 	
 	app.get('/test', (req, res) => {
-		console.log(req.headers)
-		console.log(req.header())
-
-		/* console.log(allowedIps.ips)
-		console.log('adress', req.socket.address())
-		console.log('localadress', req.socket.localAddress)
-		console.log('remoteadress', req.socket.remoteAddress)
-		console.log('ips', req.ips)
-		console.log('is', req.is())
-		console.log('hostname', req.hostname)
-		console.log('ip', req.ip)
-		console.log('route', req.route)
-		console.log('subdomains', req.subdomains)
-		console.log('url', req.url) */
-		const clientIp = req.socket.address().address
+		const clientIp = req.headers['x-forwarded-for']
 		if (allowedIps.ips.includes(clientIp)) {
 			res.send({resp: "true"})
 		} else {
