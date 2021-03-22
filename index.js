@@ -417,10 +417,12 @@ client.on('message', message => {
 				} else if (comando == 'ativar') {
 					ips.concat('172.16.243.114')
 					fs.writeFileSync('./allowed-ips.json', JSON.stringify(ips), 'utf8', () => {console.log(ips)})
+					console.log(ips)
 				} else if (comando == 'desativar') {
 					let index = ips.indexOf('172.16.243.114')
 					if (index !== -1) { ips.splice(index, 1) }
 					fs.writeFileSync('./allowed-ips.json', JSON.stringify(ips), 'utf8', () => {console.log(ips)})
+					console.log(ips)
 				} else if (comando == 'bug') {
 					const lang = getLanguage(message.member)
 					const isEnglish = lang.name === 'English'
