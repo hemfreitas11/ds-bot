@@ -2,11 +2,16 @@ const bodyParser = require('body-parser')
 const express = require('express')
 const app = express()
 
+const MongoClient = require('mongodb').MongoClient;
+const uri = "mongodb+srv://bkstore:u7J5XauhQSfLG4@cluster0.whtpt.mongodb.net/allowedIps?retryWrites=true&w=majority";
+const mongoClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+let collection = ''
+
 app.use(express.static('.'))
-app.use(bodyParser.urlencoded({extended: true}))
+app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
-let allowedIps =  require('./allowed-ips.json')
+let allowedIps = require('./allowed-ips.json')
 
 const Discord = require('discord.js')
 const Fuse = require('fuse.js')
@@ -21,6 +26,7 @@ const idBot = '747158660744216678'
 
 // let mutedUsers = require('./muted-users.json')
 
+/* #region   */
 let cmdsArray = [
 	{
 		"plugin": ["Bkteleport", "BkTeleporte"],
@@ -326,18 +332,19 @@ const erroCor = "#FF1B00"
 const listaCmds = new Fuse(cmdsArray, options)
 
 let status = false
+/* #endregion */
 
 client.once('ready', async () => {
 	try {
 		client.channels.cache.get(canalRegistro).messages.fetch(undefined, true)
-		
+
 		let prevNum = 0
 		let ale = 0
 
 		setInterval(() => {
-			while (ale == prevNum) ale = Math.floor(Math.random()*cmdsArray.length)
+			while (ale == prevNum) ale = Math.floor(Math.random() * cmdsArray.length)
 			prevNum = ale
-			if (status) { 
+			if (status) {
 				client.user.setActivity(`!help ${cmdsArray[ale].nome[0]}`, {
 					type: 'PLAYING'
 				})
@@ -361,20 +368,25 @@ client.once('ready', async () => {
 		// 		fs.writeFileSync('./muted-users.json', JSON.stringify(mutedUsers), 'utf8', () => {console.log(mutedUsers.users)})
 		// 	}
 		// }, 3600000)
-	} catch(error) {console.log(error)}
+	} catch (error) { console.log(error) }
 	console.log('Bot Iniciado!')
-	
+
 	app.get('/test', (req, res) => {
 		const clientIp = req.headers['x-forwarded-for']
 		if (allowedIps.ips.includes(clientIp)) {
-			res.send({resp: "true"})
+			res.send({ resp: "true" })
 		} else {
-			res.send({resp: "false"})
+			res.send({ resp: "false" })
 		}
 
 	})
 
 	app.listen(process.env.PORT, '0.0.0.0', () => {
+		mongoClient.connect(err => {
+			collection = mongoClient.db("allowedIps").collection("allowedIps");
+			// perform actions on the collection object
+			mongoClient.close();
+		});
 		console.log('Servidor Ligado')
 	})
 	console.log(allowedIps.ips)
@@ -400,130 +412,194 @@ client.on('message', message => {
 				.setURL('https://discord.gg/pVTjJT9mXZ')
 				.addFields(
 					{ name: '\u200B', value: '\u200B' },
-					{ name: '**#English**', value: 'Click the 🇺🇸 reaction bellow this message to set your language to English.', inline:true},
-					{ name: '**#Português**', value: 'Clique na reação 🇧🇷 abaixo dessa mensagem para colocar o seu idioma como Português.', inline:true},
+					{ name: '**#English**', value: 'Click the 🇺🇸 reaction bellow this message to set your language to English.', inline: true },
+					{ name: '**#Português**', value: 'Clique na reação 🇧🇷 abaixo dessa mensagem para colocar o seu idioma como Português.', inline: true },
 					{ name: '\u200B', value: '\u200B' },
+				)
+				.setThumbnail('https://i.imgur.com/aWQ9aBT.png')
+				.setFooter('#Bkr1253 - http://bit.ly/bk-plugins'))
+				.then(message => {
+					message.react('🇺🇸')
+					return message
+				})
+				.then(message => {
+					message.react('🇧🇷')
+					return message
+				})
+				.catch(error => { console.log(error) })
+		} else if (comando == 'ativar') {
+			if (args.length == 1) {
+				let ip = args[0]
+
+				let index = allowedIps.ips.indexOf(ip)
+				if (index == -1) {
+					allowedIps.ips.push(ip)
+					fs.writeFile(`${__dirname}/allowed-ips.json`, JSON.stringify(allowedIps), 'utf8', () => { })
+
+					message.reply(buildEmbed(false).setTitle('Sucesso').setURL('').setDescription('IP ativado com sucesso.'))
+				} else {
+					message.reply(buildEmbed(true).setTitle('IP inválido').setURL('').setDescription('O IP informado já foi ativado.'))
+				}
+
+				message.reply(allowedIps.ips)
+			} else {
+				message.reply(buildEmbed(true).setTitle('Erro de sintaxe').setURL('').setDescription('IP não informado.'))
+			}
+
+		} else if (comando == 'desativar') {
+			if (args.length == 1) {
+				let ip = args[0]
+
+				let index = allowedIps.ips.indexOf(ip)
+				if (index !== -1) {
+					allowedIps.ips.splice(index, 1)
+					fs.writeFile(`${__dirname}/allowed-ips.json`, JSON.stringify(allowedIps), 'utf8', () => { })
+					message.reply(buildEmbed(false).setTitle('Sucesso').setURL('').setDescription('IP desativado com sucesso.'))
+				} else {
+					message.reply(buildEmbed(true).setTitle('IP inválido').setURL('').setDescription('O IP informado não está ativado.'))
+				}
+				message.reply(allowedIps.ips)
+			} else {
+				message.reply(buildEmbed(true).setTitle('Erro de sintaxe').setURL('').setDescription('Ip não informado.'))
+			}
+		} else if (comando == 'bug') {
+			const lang = getLanguage(message.member)
+			const isEnglish = lang.name === 'English'
+
+			let title = isEnglish ? 'How To Report A Bug' : 'Como Reportar Um Bug'
+
+			let titl = isEnglish ? `Hi there, i'm here to help!` : `Olá, eu estou aqui para ajudar!`
+			let cmdTitle = isEnglish ? `To ensure the problem is properly described, plese fill the form bellow with the details of the bug.` : `Para garantir que o problema seja descrito de forma correta, preencha o formulário abaixo com os detalhes do bug.`
+			let desc = isEnglish ? 'Short description of the problem' : 'Pequena descrição do problema'
+			let usage = isEnglish ? 'Did you try to do anything to fix it? If yes, what?' : 'Você tentou fazer algo para arrumar o bug? Se sim, o que?'
+			let perm = isEnglish ? 'Do you use any of my other plugins? If yes, which one?' : 'Você usa algum dos meus outros plugins? Se sim, qual?'
+			let help = isEnglish ? 'Was there an error in the console? If yes, send a screenshot of it' : 'Teve algum erro no console? Se sim, mande uma foto dele'
+
+			message.reply(
+				buildEmbed()
+					.setURL('')
+					.addFields(
+						{ name: '\u200b', value: '\u200b' },
+						{ name: titl, value: cmdTitle },
+						{ name: '\u200b', value: '\u200b' },
+						{ name: '\u200b', value: `\n\n\n**Plugin**:\n**${desc}**:\n**${usage}**:\n**${perm}**:\n**${help}**:` }
 					)
+					.setTitle(title)
 					.setThumbnail('https://i.imgur.com/aWQ9aBT.png')
-					.setFooter('#Bkr1253 - http://bit.ly/bk-plugins'))
-					.then(message => {
-						message.react('🇺🇸')
-						return message
-					})
-					.then(message => {
-						message.react('🇧🇷')
-						return message
-					})
-					.catch(error => {console.log(error)})
-				} else if (comando == 'ativar') {
-					if (args.length == 1) {
-						let ip = args[0]
+			)
 
-						let index = allowedIps.ips.indexOf(ip)
-						if (index == -1) {
-							allowedIps.ips.push(ip)
-							fs.writeFile(`${__dirname}/allowed-ips.json`, JSON.stringify(allowedIps), 'utf8', () => {})
-							
-							message.reply(buildEmbed(false).setTitle('Sucesso').setURL('').setDescription('IP ativado com sucesso.'))
-						} else {
-							message.reply(buildEmbed(true).setTitle('IP inválido').setURL('').setDescription('O IP informado já foi ativado.'))
-						}
-						
-						message.reply(allowedIps.ips)
-					} else {
-						message.reply(buildEmbed(true).setTitle('Erro de sintaxe').setURL('').setDescription('IP não informado.'))
-					}
-					
-				} else if (comando == 'desativar') {
-					if (args.length == 1) {
-						let ip = args[0]
-						
-						let index = allowedIps.ips.indexOf(ip)
-						if (index !== -1) { 
-							allowedIps.ips.splice(index, 1) 
-							fs.writeFile(`${__dirname}/allowed-ips.json`, JSON.stringify(allowedIps), 'utf8', () => {})
-							message.reply(buildEmbed(false).setTitle('Sucesso').setURL('').setDescription('IP desativado com sucesso.'))
-						} else {
-							message.reply(buildEmbed(true).setTitle('IP inválido').setURL('').setDescription('O IP informado não está ativado.'))
-						}
-						message.reply(allowedIps.ips)	
-					} else {
-						message.reply(buildEmbed(true).setTitle('Erro de sintaxe').setURL('').setDescription('Ip não informado.'))
-					}
-				} else if (comando == 'bug') {
-					const lang = getLanguage(message.member)
-					const isEnglish = lang.name === 'English'
-					
-					let title = isEnglish ? 'How To Report A Bug' : 'Como Reportar Um Bug'
-					
-					let titl = isEnglish ? `Hi there, i'm here to help!` : `Olá, eu estou aqui para ajudar!`
-					let cmdTitle = isEnglish ? `To ensure the problem is properly described, plese fill the form bellow with the details of the bug.` : `Para garantir que o problema seja descrito de forma correta, preencha o formulário abaixo com os detalhes do bug.`
-					let desc = isEnglish ? 'Short description of the problem' : 'Pequena descrição do problema'
-					let usage = isEnglish ? 'Did you try to do anything to fix it? If yes, what?' : 'Você tentou fazer algo para arrumar o bug? Se sim, o que?'
-					let perm = isEnglish ? 'Do you use any of my other plugins? If yes, which one?' : 'Você usa algum dos meus outros plugins? Se sim, qual?'
-					let help = isEnglish ? 'Was there an error in the console? If yes, send a screenshot of it' : 'Teve algum erro no console? Se sim, mande uma foto dele'
+		} else if (comando == 'help' || comando == 'ajuda' || comando == 'permissao' || comando == 'permission' || comando == 'perm') {
+			const lang = getLanguage(message.member)
+			const isEnglish = lang.name === 'English'
+			const comandos = listaCmds.search(args.toString())
 
-					message.reply(
-						buildEmbed()
+			let title = isEnglish ? 'Command Help' : 'Ajuda do comando'
+
+			if (comandos.length > 0) {
+				const key = isEnglish ? 0 : 1
+				const comando = comandos[0].item
+
+				let cmdTitle = isEnglish ? `${comando.nome[key][0].toUpperCase() + comando.nome[key].slice(1)} Command` : `Comando ${comando.nome[key][0].toUpperCase() + comando.nome[key].slice(1)}`
+				let desc = isEnglish ? 'Description' : 'Descrição'
+				let usage = isEnglish ? 'Usage' : 'Uso'
+				let perm = isEnglish ? 'Permission' : 'Permissão'
+				let sugested = isEnglish ? 'Similar commands' : 'Comandos similares'
+				let help = isEnglish ? 'help' : 'ajuda'
+
+				message.reply(
+					buildEmbed()
 						.setURL('')
-						.addFields(
-							{ name: '\u200b', value: '\u200b'},
-							{ name: titl, value: cmdTitle},
-							{ name: '\u200b', value: '\u200b'},
-							{ name: '\u200b', value: `\n\n\n**Plugin**:\n**${desc}**:\n**${usage}**:\n**${perm}**:\n**${help}**:`}
-						)
 						.setTitle(title)
-						.setThumbnail('https://i.imgur.com/aWQ9aBT.png')
-					)
-
-				} else if (comando == 'help' || comando == 'ajuda' || comando == 'permissao' || comando == 'permission' || comando == 'perm') {
-					const lang = getLanguage(message.member)
-					const isEnglish = lang.name === 'English'
-					const comandos = listaCmds.search(args.toString())
-					
-					let title = isEnglish ? 'Command Help' : 'Ajuda do comando'
-
-					if (comandos.length > 0) {
-						const key = isEnglish ? 0 : 1
-						const comando = comandos[0].item
-
-						let cmdTitle = isEnglish ? `${comando.nome[key][0].toUpperCase() + comando.nome[key].slice(1)} Command` : `Comando ${comando.nome[key][0].toUpperCase() + comando.nome[key].slice(1)}`
-						let desc = isEnglish ? 'Description' : 'Descrição'
-						let usage = isEnglish ? 'Usage' : 'Uso'
-						let perm = isEnglish ? 'Permission' : 'Permissão'
-						let sugested = isEnglish ? 'Similar commands' : 'Comandos similares'
-						let help = isEnglish ? 'help' : 'ajuda'
-
-						message.reply(
-							buildEmbed()
-							.setURL('')
-							.setTitle(title)
-							.addFields(
-								{name: cmdTitle, value: `***Plugin***: *${comando.plugin[key]}*\n***${desc}***: *${comando.desc[key]}*\n***${usage}***: *${comando.uso[key]}*\n***${perm}***: *${comando.perm}*\n\n`},
-							)
-							.setFooter(`${sugested}: \n!${help} ${comandos[1].item.nome[key] || 'null'}   !${help} ${comandos[2].item.nome[key] || 'null'}   !${help} ${comandos[3].item.nome[key]|| 'null'}   !${help} ${comandos[4].item.nome[key]|| 'null'}`)
+						.addFields(
+							{ name: cmdTitle, value: `***Plugin***: *${comando.plugin[key]}*\n***${desc}***: *${comando.desc[key]}*\n***${usage}***: *${comando.uso[key]}*\n***${perm}***: *${comando.perm}*\n\n` },
 						)
+						.setFooter(`${sugested}: \n!${help} ${comandos[1].item.nome[key] || 'null'}   !${help} ${comandos[2].item.nome[key] || 'null'}   !${help} ${comandos[3].item.nome[key] || 'null'}   !${help} ${comandos[4].item.nome[key] || 'null'}`)
+				)
 
-					} else {
-						let n = isEnglish ? 'Command not found' : 'Comando não encontrado'
-						let v = isEnglish ? `The command '${args.toString()}' was not found, try again!` : `O comando '${args.toString()}' não foi encontrado, tente novamente!`
+			} else {
+				let n = isEnglish ? 'Command not found' : 'Comando não encontrado'
+				let v = isEnglish ? `The command '${args.toString()}' was not found, try again!` : `O comando '${args.toString()}' não foi encontrado, tente novamente!`
 
-						message.reply(
-							buildEmbed(true)
-								.setURL('')
-								.setTitle(title)
-								.addFields(
-									{name: n, value: v},
-								)
+				message.reply(
+					buildEmbed(true)
+						.setURL('')
+						.setTitle(title)
+						.addFields(
+							{ name: n, value: v },
 						)
-					}
+				)
+			}
 
 		} else if (comando == 'comandos' || comando == 'commands') {
-							
+
 		}
-	} catch(error) {console.log(error)}
+	} catch (error) { console.log(error) }
 })
 
+client.on('messageReactionAdd', (reaction, user) => {
+	try {
+		if (!user.bot) {
+			let message = reaction.message, emoji = reaction.emoji;
+			const guild = message.guild
+			const member = guild.member(user)
+
+			const ptRole = guild.roles.cache.find(r => r.name === 'Portugues')
+			const engRole = guild.roles.cache.find(r => r.name === 'English')
+
+			member.send(emoji.name == '🇺🇸' ? engMsg(member.displayName) : ptMsg(member.displayName))
+				.then(message => message.react('👍'))
+				.catch(error => { console.log(error) })
+			member.roles.add(emoji.name == '🇺🇸' ? engRole : ptRole)
+		}
+	} catch (error) { console.log(error) }
+})
+
+client.on('messageReactionRemove', (reaction, user) => {
+	try {
+		if (!user.bot) {
+			const msgs = []
+			// const member = reaction.message.guild.member(user)
+
+			const guild = reaction.message.guild
+			const ptRole = guild.roles.cache.find(r => r.name === 'Portugues')
+			const engRole = guild.roles.cache.find(r => r.name === 'English')
+
+			try {
+				if (user.dmChannel != null) {
+					user.dmChannel.messages.fetch()
+						.then(messages => {
+							messages.forEach(m => {
+								if (m.author.id === idBot) {
+									msgs.push(m)
+								}
+							})
+							msgs[0].delete()
+
+							// let toDelete = 0
+
+							// console.log(member.roles.cache)
+							// console.log(member.roles.cache.some(r => r.name === 'Portugues'))
+
+							// if ((member.roles.cache.some(r => r.name === 'Portugues') && !member.roles.cache.some(r => r.name === 'English')) || 
+							// 	(member.roles.cache.some(r => r.name === 'English') && !member.roles.cache.some(r => r.name === 'Portugues'))) toDelete = 1
+							// else if (member.roles.cache.some(r => r.name === 'Portugues') && member.roles.cache.some(r => r.name === 'English')) toDelete = 2
+							// while (toDelete > 0) {
+							// 	msgs[0].delete()
+							// 	toDelete -= 1
+							// }
+						})
+						.catch(error => { console.log(error) });
+				}
+			} catch (error) { console.log(error) }
+
+			let message = reaction.message, emoji = reaction.emoji;
+
+			guild.member(user).roles.remove(emoji.name == '🇺🇸' ? engRole : ptRole)
+		}
+	} catch (error) { console.log(error) }
+})
+
+/* #region   */
 // function isMuted(message) {
 // 	mutedUsers.users.forEach(e => {
 // 		if (e.info.id == message.member.user.id) {
@@ -655,10 +731,10 @@ function isSafeMessage(message) {
 		message.delete()
 		return false
 	}
-	
-/* 	let lastSix = ''
-	let lastThree = ''
-	let triggered = false */
+
+	/* 	let lastSix = ''
+		let lastThree = ''
+		let triggered = false */
 
 	for (let c = 0; c < cont.length; c++) {
 		if (message.content.toLowerCase().includes(cont[c])) {
@@ -708,7 +784,7 @@ function buildEmbed(isError) {
 
 function getLanguage(member) {
 	const guild = member.guild
-	return member.roles.cache.some(r => r.name === 'Portugues') ? guild.roles.cache.find(r => r.name === 'Portugues') : 
+	return member.roles.cache.some(r => r.name === 'Portugues') ? guild.roles.cache.find(r => r.name === 'Portugues') :
 		guild.roles.cache.find(r => r.name === 'English')
 }
 
@@ -720,13 +796,13 @@ function ptMsg(displayName) {
 		.setURL('https://discord.gg/pVTjJT9mXZ')
 		.addFields(
 			{ name: '\u200B', value: '\u200B' },
-			{ name: 'Suporte para Erros', value: 'Poste o seu problema no canal #Bugs do plugin em que você deseja receber ajuda.'},
+			{ name: 'Suporte para Erros', value: 'Poste o seu problema no canal #Bugs do plugin em que você deseja receber ajuda.' },
 			{ name: '\u200B', value: '\u200B' },
-			{ name: 'Sugestões são sempre bem-vindas', value: 'Deixe suas sugestões sobre o que eu posso melhorar nos plugins no canal #Sugestões.'},
+			{ name: 'Sugestões são sempre bem-vindas', value: 'Deixe suas sugestões sobre o que eu posso melhorar nos plugins no canal #Sugestões.' },
 			{ name: '\u200B', value: '\u200B' },
-			{ name: '#Regras', value: 'Canal onde você encontrará as regras do servidor.', inline:true},
-			{ name: '#Encomendar-Plugin', value: 'Aqui você pode encomendar plugins.', inline:true},
-			{ name: '#Comandos', value: 'Uma lista de todos os comandos disponiveis no servidor.', inline:true},
+			{ name: '#Regras', value: 'Canal onde você encontrará as regras do servidor.', inline: true },
+			{ name: '#Encomendar-Plugin', value: 'Aqui você pode encomendar plugins.', inline: true },
+			{ name: '#Comandos', value: 'Uma lista de todos os comandos disponiveis no servidor.', inline: true },
 			{ name: '\u200B', value: '\u200B' },
 		)
 		.setThumbnail('https://i.imgur.com/aWQ9aBT.png')
@@ -741,78 +817,16 @@ function engMsg(displayName) {
 		.setURL('https://discord.gg/pVTjJT9mXZ')
 		.addFields(
 			{ name: '\u200B', value: '\u200B' },
-			{ name: 'Error Support', value: 'Post you problem in the #Bugs channel from the plugin you wish to receive help for.'},
+			{ name: 'Error Support', value: 'Post you problem in the #Bugs channel from the plugin you wish to receive help for.' },
 			{ name: '\u200B', value: '\u200B' },
-			{ name: 'Sugestions are always welcome', value: 'Leave your sugestions about what i can improve in the #Sugestions channel.'},
+			{ name: 'Sugestions are always welcome', value: 'Leave your sugestions about what i can improve in the #Sugestions channel.' },
 			{ name: '\u200B', value: '\u200B' },
-			{ name: '#Rules', value: 'Channel where you will has the server rules.', inline:true},
-			{ name: '#Order-Plugin', value: 'Here you can order plugins.', inline:true},
-			{ name: '#Commands', value: 'A list of all available commands in the server.', inline:true},
+			{ name: '#Rules', value: 'Channel where you will has the server rules.', inline: true },
+			{ name: '#Order-Plugin', value: 'Here you can order plugins.', inline: true },
+			{ name: '#Commands', value: 'A list of all available commands in the server.', inline: true },
 			{ name: '\u200B', value: '\u200B' },
 		)
 		.setThumbnail('https://i.imgur.com/aWQ9aBT.png')
 		.setFooter('#Bkr1253 - My plugins: http://bit.ly/bk-plugins')
 }
-
-client.on('messageReactionAdd', (reaction, user) => {
-	try {
-		if (!user.bot) {
-			let message = reaction.message, emoji = reaction.emoji;
-			const guild = message.guild
-			const member = guild.member(user)
-			
-			const ptRole = guild.roles.cache.find(r => r.name === 'Portugues')
-			const engRole = guild.roles.cache.find(r => r.name === 'English')
-	
-			member.send(emoji.name == '🇺🇸' ? engMsg(member.displayName) : ptMsg(member.displayName))
-				.then(message => message.react('👍'))
-				.catch(error => {console.log(error)})
-			member.roles.add(emoji.name == '🇺🇸' ? engRole : ptRole)
-		}
-	} catch(error) {console.log(error)}
-})
-
-client.on('messageReactionRemove', (reaction, user) => {
-	try {
-		if (!user.bot) {
-			const msgs = []
-			// const member = reaction.message.guild.member(user)
-			
-			const guild = reaction.message.guild
-			const ptRole = guild.roles.cache.find(r => r.name === 'Portugues')
-			const engRole = guild.roles.cache.find(r => r.name === 'English')
-			
-			try {
-				if (user.dmChannel != null) {
-					user.dmChannel.messages.fetch()
-						.then(messages => {
-							messages.forEach(m => {
-								if (m.author.id === idBot) {
-									msgs.push(m)
-								}
-							})
-							msgs[0].delete()
-			
-							// let toDelete = 0
-			
-							// console.log(member.roles.cache)
-							// console.log(member.roles.cache.some(r => r.name === 'Portugues'))
-			
-							// if ((member.roles.cache.some(r => r.name === 'Portugues') && !member.roles.cache.some(r => r.name === 'English')) || 
-							// 	(member.roles.cache.some(r => r.name === 'English') && !member.roles.cache.some(r => r.name === 'Portugues'))) toDelete = 1
-							// else if (member.roles.cache.some(r => r.name === 'Portugues') && member.roles.cache.some(r => r.name === 'English')) toDelete = 2
-							// while (toDelete > 0) {
-							// 	msgs[0].delete()
-							// 	toDelete -= 1
-							// }
-						})
-					.catch(error => {console.log(error)});
-				} 
-			} catch (error) {console.log(error)}
-	
-			let message = reaction.message, emoji = reaction.emoji;
-	
-			guild.member(user).roles.remove(emoji.name == '🇺🇸' ? engRole : ptRole)
-		}
-	} catch(error) {console.log(error)}
-})
+/* #endregion */
