@@ -3,6 +3,17 @@ const express = require('express')
 const app = express()
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
+const Discord = require('discord.js')
+const client = new Discord.Client()
+const Fuse = require('fuse.js')
+
+app.use(express.static('.'))
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
+
+/* #region   */
+
+// let mutedUsers = require('./muted-users.json')
 
 const usuarioRegistrado = new Schema({
 	plugin: {
@@ -21,23 +32,8 @@ const usuarioRegistrado = new Schema({
 
 const UserRegistrado = mongoose.model('allowedIps', usuarioRegistrado)
 
-// const MongoClient = require('mongodb').MongoClient;
 const uri = "mongodb+srv://bkstore:u7J5XauhQSfLG4@cluster0.whtpt.mongodb.net/allowedIps?retryWrites=true&w=majority"/* process.env.MONGODB_URI */;
 
-
-// const mongoClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-// let collection = ''
-
-app.use(express.static('.'))
-app.use(bodyParser.urlencoded({ extended: true }))
-app.use(bodyParser.json())
-
-let allowedIps = require('./allowed-ips.json')
-
-const Discord = require('discord.js')
-const Fuse = require('fuse.js')
-const fs = require('fs')
-const client = new Discord.Client()
 const token = 'NzQ3MTU4NjYwNzQ0MjE2Njc4.X0Kzug.r0PMdmsZI7oXLHUaQWtIWUnLI70'
 const prefix = '!'
 client.commands = new Discord.Collection()
@@ -45,9 +41,6 @@ client.commands = new Discord.Collection()
 const canalRegistro = '748731824804462702'
 const idBot = '747158660744216678'
 
-// let mutedUsers = require('./muted-users.json')
-
-/* #region   */
 let cmdsArray = [
 	{
 		"plugin": ["Bkteleport", "BkTeleporte"],
@@ -376,50 +369,44 @@ client.once('ready', async () => {
 				})
 				status = true
 			}
-		}, 4000);
-		// setInterval(() => {
-		// 	if (mutedUsers.users.length > 0) {
-		// 		mutedUsers.users.forEach(user => {
-		// 			user.hours = user.hours - 1
-		// 			if (user.hours == 0) {
-		// 				delete mutedUsers.users[mutedUsers.users.indexOf(user)]
-		// 				mutedUsers.users = mutedUsers.users.filter(e => e != null)
-		// 			}
-		// 		})
-		// 		fs.writeFileSync('./muted-users.json', JSON.stringify(mutedUsers), 'utf8', () => {console.log(mutedUsers.users)})
-		// 	}
-		// }, 3600000)
-	} catch (error) { console.log(error) }
-	console.log('Bot Iniciado!')
-	
-	mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
-	.then(result => {
-		app.get('/test', (req, res) => {
-			const clientIp = req.headers['x-forwarded-for']
-			UserRegistrado.find()
-				.then(mongoUsers => mongoUsers.filter(userRegistrado => userRegistrado.allowedIP == clientIp))
-				.then(registros => registros.filter(registro => registro.plugin == "BkX1"))
-				.then(registroArray => {
-					if (registroArray[0] !== undefined) {
-						res.send({ resp: "true" })
-					} else {
-						res.send({ resp: "false" })
+		}, 4000)
+
+		mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+			.then(result => {
+				app.get('/test', (req, res) => {
+					const clientIp = req.headers['x-forwarded-for']
+					UserRegistrado.find()
+						.then(mongoUsers => mongoUsers.filter(userRegistrado => userRegistrado.allowedIP == clientIp))
+						.then(registros => registros.filter(registro => registro.plugin == "BkX1"))
+						.then(registroArray => {
+							if (registroArray[0] !== undefined) {
+								res.send({ resp: "true" })
+							} else {
+								res.send({ resp: "false" })
+							}
+						})
+				})
+				app.listen(process.env.PORT, '0.0.0.0', () => {
+					console.log('Backend Ligado')
+				})
+				console.log('Banco de Dados Conectado')
+			})
+			.catch(err => {console.log(err)})
+
+		/* setInterval(() => {
+			if (mutedUsers.users.length > 0) {
+				mutedUsers.users.forEach(user => {
+					user.hours = user.hours - 1
+					if (user.hours == 0) {
+						delete mutedUsers.users[mutedUsers.users.indexOf(user)]
+						mutedUsers.users = mutedUsers.users.filter(e => e != null)
 					}
 				})
-		})
-		app.listen(process.env.PORT, '0.0.0.0', () => {
-			// mongoClient.connect(err => {
-			// 	collection = mongoClient.db("allowedIps").collection("allowedIps");
-			// 	// perform actions on the collection object
-			// 	mongoClient.close();
-			// });
-			console.log('Backend Ligado')
-		})
-		console.log('Banco de Dados Conectado')
-	})
-	.catch(err => {console.log(err)})
-	console.log(allowedIps.ips)
-
+				fs.writeFileSync('./muted-users.json', JSON.stringify(mutedUsers), 'utf8', () => {console.log(mutedUsers.users)})
+			}
+		}, 3600000) */
+	} catch (error) { console.log(error) }
+	console.log('Bot Iniciado!')
 })
 
 client.login(token)
@@ -492,18 +479,6 @@ client.on('message', message => {
 						}
 					})
 					.catch(err => message.reply(err))
-
-				/* let index = allowedIps.ips.indexOf(ip)
-				if (index == -1) {
-					allowedIps.ips.push(ip)
-					fs.writeFile(`${__dirname}/allowed-ips.json`, JSON.stringify(allowedIps), 'utf8', () => { })
-
-					message.reply(buildEmbed(false).setTitle('Sucesso').setURL('').setDescription('IP ativado com sucesso.'))
-				} else {
-					message.reply(buildEmbed(true).setTitle('IP inválido').setURL('').setDescription('O IP informado já foi ativado.'))
-				}
-
-				message.reply(allowedIps.ips) */
 			} else if (args.length == 1) {
 				message.reply(buildEmbed(true).setTitle('Erro de sintaxe').setURL('').setDescription('Você não informou o IP.'))
 			} else {
@@ -526,16 +501,6 @@ client.on('message', message => {
 						}
 					})
 					.catch(err => message.reply(err))
-
-				/* let index = allowedIps.ips.indexOf(ip)
-				if (index !== -1) {
-					allowedIps.ips.splice(index, 1)
-					fs.writeFile(`${__dirname}/allowed-ips.json`, JSON.stringify(allowedIps), 'utf8', () => { })
-					message.reply(buildEmbed(false).setTitle('Sucesso').setURL('').setDescription('IP desativado com sucesso.'))
-				} else {
-					message.reply(buildEmbed(true).setTitle('IP inválido').setURL('').setDescription('O IP informado não está ativado.'))
-				}
-				message.reply(allowedIps.ips) */
 			} else {
 				message.reply(buildEmbed(true).setTitle('Erro de sintaxe').setURL('').setDescription('Você não informou o nome do Plugin que deseja desautorizar.'))
 			}
