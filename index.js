@@ -364,7 +364,7 @@ client.once('ready', async () => {
 	} catch(error) {console.log(error)}
 	console.log('Bot Iniciado!')
 	
-	app.post('/test', (req, res) => {
+	app.get('/test', (req, res) => {
 		console.log(allowedIps.ips)
 		console.log('adress', req.socket.address())
 		console.log('localadress', req.socket.localAddress)
