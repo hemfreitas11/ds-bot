@@ -371,7 +371,7 @@ client.once('ready', async () => {
 		} else {
 			res.send({resp: "false"})
 		}
-		
+
 	})
 
 	app.listen(process.env.PORT, '0.0.0.0', () => {
@@ -417,12 +417,14 @@ client.on('message', message => {
 					.catch(error => {console.log(error)})
 				} else if (comando == 'ativar') {
 					allowedIps.ips.concat('172.16.243.114')
-					fs.writeFileSync('./allowed-ips.json', JSON.stringify(allowedIps), 'utf8', () => {console.log(allowedIps.ips)})
+					fs.writeFile('./allowed-ips.json', JSON.stringify(allowedIps), 'utf8', () => {console.log(allowedIps.ips)})
+					allowedIps = require('./allowed-ips.json')
 					message.reply(allowedIps.ips)
 				} else if (comando == 'desativar') {
 					let index = allowedIps.ips.indexOf('172.16.243.114')
 					if (index !== -1) { allowedIps.ips.splice(index, 1) }
-					fs.writeFileSync('./allowed-ips.json', JSON.stringify(allowedIps), 'utf8', () => {console.log(allowedIps.ips)})
+					fs.writeFile('./allowed-ips.json', JSON.stringify(allowedIps), 'utf8', () => {console.log(allowedIps.ips)})
+					allowedIps = require('./allowed-ips.json')
 					message.reply(allowedIps.ips)
 				} else if (comando == 'bug') {
 					const lang = getLanguage(message.member)
