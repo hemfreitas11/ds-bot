@@ -373,7 +373,7 @@ client.once('ready', async () => {
 
 		mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
 			.then(result => {
-				app.get('/test', (req, res) => {
+				app.get('/ver', (req, res) => {
 					const clientIp = req.headers['x-forwarded-for']
 					UserRegistrado.find()
 						.then(mongoUsers => mongoUsers.filter(userRegistrado => userRegistrado.allowedIP == clientIp))
@@ -386,7 +386,7 @@ client.once('ready', async () => {
 							}
 						})
 				})
-				app.listen(process.env.PORT, '0.0.0.0', () => {
+				app.listen(/* process.env.PORT */8080, '0.0.0.0', () => {
 					console.log('Backend Ligado')
 				})
 				console.log('Banco de Dados Conectado')
