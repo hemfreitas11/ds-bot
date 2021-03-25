@@ -457,7 +457,7 @@ client.on('message', message => {
 		} else if (comando == 'autorizar') {
 			if (args.length == 2) {
 				
-				let pl = args[0]
+				let pl = args[0].toLowerCase()
 				let ip = args[1]
 				
 				UserRegistrado.find()
@@ -497,7 +497,7 @@ client.on('message', message => {
 	
 		} else if (comando == 'desautorizar') {
 			if (args.length == 1) {
-				let pl = args[0]
+				let pl = args[0].toLowerCase()
 				UserRegistrado.find()
 					.then(mongoUsers => mongoUsers.filter(userRegistrado => userRegistrado.userID == message.member.user.id))
 					.then(registros => registros.filter(registro => registro.plugin == pl))
