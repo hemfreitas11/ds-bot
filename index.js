@@ -386,7 +386,7 @@ client.once('ready', async () => {
 							}
 						})
 				})
-				app.listen(/* process.env.PORT */8080, '0.0.0.0', () => {
+				app.listen(process.env.PORT, '0.0.0.0', () => {
 					console.log('Backend Ligado')
 				})
 				console.log('Banco de Dados Conectado')
