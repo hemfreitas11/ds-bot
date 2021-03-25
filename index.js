@@ -375,12 +375,20 @@ client.once('ready', async () => {
 			.then(result => {
 				app.get('/ver', (req, res) => {
 					const clientIp = req.headers['x-forwarded-for']
+					const plugin = req.headers['plugin']
 					console.log(clientIp)
-					console.log(req.headers['plugin'])
+					console.log(plugin)
 					UserRegistrado.find()
-						.then(mongoUsers => mongoUsers.filter(userRegistrado => userRegistrado.allowedIP == clientIp))
-						.then(registros => registros.filter(registro => registro.plugin == "BkX1"))
+						.then(mongoUsers => mongoUsers.filter(userRegistrado => {
+							console.log(userRegistrado.allowedIP)
+							return userRegistrado.allowedIP == clientIp
+						}))
+						.then(registros => registros.filter(registro => { 
+							console.log(registro.plugin)
+							return registro.plugin == plugin
+						}))
 						.then(registroArray => {
+							console.log(registroArray[0])
 							if (registroArray[0] !== undefined) {
 								res.send({ resp: "true" })
 							} else {
