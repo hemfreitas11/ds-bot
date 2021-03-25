@@ -500,7 +500,7 @@ client.on('message', message => {
 				let pl = args[0].toLowerCase()
 				UserRegistrado.find()
 					.then(mongoUsers => mongoUsers.filter(userRegistrado => userRegistrado.userID == message.member.user.id))
-					.then(registros => registros.filter(registro => registro.plugin == pl))
+					.then(registros => registros.filter(registro => registro.plugin.toLowerCase() == pl))
 					.then(registroArray => {
 						if (registroArray[0] === undefined) {
 							message.reply(buildEmbed(true).setTitle('Erro').setURL('').setDescription(`Você não tem uma autorização no plugin **${pl}**`))
