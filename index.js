@@ -385,10 +385,10 @@ client.once('ready', async () => {
 						}))
 						.then(registros => registros.filter(registro => { 
 							console.log(registros)
-							return registro.plugin == plugin
+							return registro.plugin.toLowerCase() == plugin.toLowerCase()
 						}))
 						.then(registroArray => {
-							console.log(registroArray[0])
+							console.log(registroArray)
 							if (registroArray[0] !== undefined) {
 								res.send({ resp: "true" })
 							} else {
