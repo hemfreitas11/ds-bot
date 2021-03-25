@@ -379,16 +379,9 @@ client.once('ready', async () => {
 					console.log(clientIp)
 					console.log(plugin)
 					UserRegistrado.find()
-						.then(mongoUsers => mongoUsers.filter(userRegistrado => {
-							console.log(mongoUsers)
-							return userRegistrado.allowedIP == clientIp
-						}))
-						.then(registros => registros.filter(registro => { 
-							console.log(registros)
-							return registro.plugin.toLowerCase() == plugin.toLowerCase()
-						}))
+						.then(mongoUsers => mongoUsers.filter(userRegistrado => userRegistrado.allowedIP == clientIp))
+						.then(registros => registros.filter(registro => registro.plugin.toLowerCase() == plugin.toLowerCase()))
 						.then(registroArray => {
-							console.log(registroArray)
 							if (registroArray[0] !== undefined) {
 								res.send({ resp: "true" })
 							} else {
