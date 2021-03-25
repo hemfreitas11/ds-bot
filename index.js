@@ -380,11 +380,11 @@ client.once('ready', async () => {
 					console.log(plugin)
 					UserRegistrado.find()
 						.then(mongoUsers => mongoUsers.filter(userRegistrado => {
-							console.log(userRegistrado.allowedIP)
+							console.log(mongoUsers)
 							return userRegistrado.allowedIP == clientIp
 						}))
 						.then(registros => registros.filter(registro => { 
-							console.log(registro.plugin)
+							console.log(registros)
 							return registro.plugin == plugin
 						}))
 						.then(registroArray => {
