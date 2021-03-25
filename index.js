@@ -375,6 +375,8 @@ client.once('ready', async () => {
 			.then(result => {
 				app.get('/ver', (req, res) => {
 					const clientIp = req.headers['x-forwarded-for']
+					console.log(clientIp)
+					console.log(req.headers['plugin'])
 					UserRegistrado.find()
 						.then(mongoUsers => mongoUsers.filter(userRegistrado => userRegistrado.allowedIP == clientIp))
 						.then(registros => registros.filter(registro => registro.plugin == "BkX1"))
