@@ -376,8 +376,6 @@ client.once('ready', async () => {
 				app.get('/ver', (req, res) => {
 					const clientIp = req.headers['x-forwarded-for']
 					const plugin = req.headers['plugin']
-					console.log(clientIp)
-					console.log(plugin)
 					UserRegistrado.find()
 						.then(mongoUsers => mongoUsers.filter(userRegistrado => userRegistrado.allowedIP == clientIp))
 						.then(registros => registros.filter(registro => registro.plugin.toLowerCase() == plugin.toLowerCase()))
@@ -388,6 +386,9 @@ client.once('ready', async () => {
 								res.send({ resp: "false" })
 							}
 						})
+				})
+				app.get('/wakeup', (req, res) => {
+					res.send('Awake!')
 				})
 				app.listen(process.env.PORT, '0.0.0.0', () => {
 					console.log('Backend Ligado')
