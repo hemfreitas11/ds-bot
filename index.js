@@ -390,6 +390,10 @@ client.once('ready', async () => {
 				app.get('/wakeup', (req, res) => {
 					res.send('Awake!')
 				})
+				app.post('/m12j-31as-k4dk-asjd-klj1-2349-8d5a', (req, res) => {
+					res.send('Awake!')
+					console.log(req)
+				})
 				app.listen(process.env.PORT, '0.0.0.0', () => {
 					console.log('Backend Ligado')
 				})
