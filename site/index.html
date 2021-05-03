@@ -20,26 +20,27 @@
 </head>
 <body>
 	<div class="botao-paypal">
-		<div id="smart-button-container">
-			<div style="text-align: center;">
-			  <div id="paypal-button-container"></div>
-			</div>
-		</div>
 	</div>
-	<script src="https://www.paypal.com/sdk/js?client-id=sb&currency=BRL" data-sdk-integration-source="button-factory"></script>
+	<div id="smart-button-container">
+		<div style="text-align: center;">
+		  <div id="paypal-button-container"></div>
+		</div>
+	  </div>
+	<script src="https://www.paypal.com/sdk/js?client-id=AWG9ajryIqdfuyjZL2zYcbq70MKj8X1jF6Xy4kXwnovU08Yk_BHkGBYkrUq1t03EqbdLWN4FfqGlLufI&currency=BRL" data-sdk-integration-source="button-factory"></script>
 	<script>
 	  function initPayPalButton() {
 		paypal.Buttons({
 		  style: {
-			shape: 'pill',
-			color: 'white',
+			shape: 'rect',
+			color: 'blue',
 			layout: 'vertical',
 			label: 'paypal',
+			
 		  },
   
 		  createOrder: function(data, actions) {
 			return actions.order.create({
-			  purchase_units: [{"description":"Plugin BkDuel","amount":{"currency_code":"BRL","value":25}}]
+			  purchase_units: [{"description":"Teste teste teste","amount":{"currency_code":"BRL","value":55}}]
 			});
 		  },
   
