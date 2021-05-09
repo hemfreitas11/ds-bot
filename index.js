@@ -1247,7 +1247,7 @@ function startPortListener() {
 	app.get('/wakeup', (req, res) => {
 		res.send('Awake!')
 	})
-	app.listen(/* process.env.PORT */ 2526, '0.0.0.0', () => {
+	app.listen(process.env.PORT, '0.0.0.0', () => {
 		console.log('Backend Ligado')
 	})
 }
