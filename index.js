@@ -1459,7 +1459,7 @@ async function comandoDesautorizar(interaction) {
 				const ip = registroArray[0].allowedIP
 				registroArray[0].remove()
 				message.reply({embeds: [
-					buildEmbed(false, interaction.author.user).setTitle(isEnglish ? 'Success' : 'Sucesso').setURL('').setDescription(isEnglish ? `You removed the authorization of the IP **${ip}** from the plugin **${pl}**\n\u200B` : `Você retirou a sua atorização do ip **${ip}** no plugin **${pl}**\n\u200B`)
+					buildEmbed(false, interaction.author.user).setTitle(isEnglish ? 'Success' : 'Sucesso').setURL('').setDescription(isEnglish ? `You removed the authorization of the IP **${ip}** from the plugin **${pl}**\n\u200B` : `Você retirou a sua autorização do ip **${ip}** no plugin **${pl}**\n\u200B`)
 				]})
 			}
 		})
