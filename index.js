@@ -1161,17 +1161,19 @@ function startInteractionListener() {
 }
 
 function startAuthenticator() {
-	app.get('/ver', (req, res) => {
+	app.get('/k1j2-39il-kjdc-ao03-90hf-a872', (req, res) => {
 		const clientIp = req.headers['x-forwarded-for']
 		const plugin = req.headers['plugin']
+		const trueResponse = `true-${clientIp}`
+		const falseResponse = `false-${clientIp}`
 		UserRegistrado.find()
 			.then(mongoUsers => mongoUsers.filter(userRegistrado => userRegistrado.allowedIP == clientIp))
 			.then(registros => registros.filter(registro => registro.plugin.toLowerCase() == plugin.toLowerCase()))
 			.then(registroArray => {
 				if (registroArray[0] !== undefined) {
-					res.send({ resp: "true" })
+					res.send({ resp: trueResponse })
 				} else {
-					res.send({ resp: "false" })
+					res.send({ resp: falseResponse })
 				}
 			})
 	})
