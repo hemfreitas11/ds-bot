@@ -1070,7 +1070,7 @@ function getConstants() {
 	const pluginsCompraveis = {
 		bkduel: {
 			nome: ['BkDuel', 'BkDuel'],
-			valor: ['8.00', '1.00', '7.00'],
+			valor: ['7.00', '1.01', '6.00'],
 			moeda: ['USD', 'BRL', 'EUR'],
 			simbolo: ['$', 'R$', '€'],
 			pagar_channel: ['838975029504901150', '839156596947943424'],
