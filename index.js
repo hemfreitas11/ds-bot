@@ -1062,7 +1062,7 @@ function getConstants() {
 
 	const SUCESSO_COR = "#2AFF00"
 	const ERRO_COR = "#FF1B00"
-	const SITE_RETORNO = 'https://git-ds-bot.herokuapp.com/'
+	const SITE_RETORNO = 'https://git-ds-bot.herokuapp.com'
 	const CANAL_REGISTRO = '748731824804462702'
 	const CANAL_WELCOME = '838851994277904465'
 	const BOT_ID = '747158660744216678'
@@ -1070,7 +1070,7 @@ function getConstants() {
 	const pluginsCompraveis = {
 		bkduel: {
 			nome: ['BkDuel', 'BkDuel'],
-			valor: ['7.00', '1.01', '6.00'],
+			valor: ['6.90', '24.90', '5.90'],
 			moeda: ['USD', 'BRL', 'EUR'],
 			simbolo: ['$', 'R$', '€'],
 			pagar_channel: ['838975029504901150', '839156596947943424'],
