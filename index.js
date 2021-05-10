@@ -1062,7 +1062,7 @@ function getConstants() {
 
 	const SUCESSO_COR = "#2AFF00"
 	const ERRO_COR = "#FF1B00"
-	const SITE_RETORNO = 'http://localhost:2526'
+	const SITE_RETORNO = 'https://git-ds-bot.herokuapp.com/'
 	const CANAL_REGISTRO = '748731824804462702'
 	const CANAL_WELCOME = '838851994277904465'
 	const BOT_ID = '747158660744216678'
@@ -1070,7 +1070,7 @@ function getConstants() {
 	const pluginsCompraveis = {
 		bkduel: {
 			nome: ['BkDuel', 'BkDuel'],
-			valor: ['8.00', '25.00', '7.00'],
+			valor: ['8.00', '1.00', '7.00'],
 			moeda: ['USD', 'BRL', 'EUR'],
 			simbolo: ['$', 'R$', '€'],
 			pagar_channel: ['838975029504901150', '839156596947943424'],
@@ -1181,9 +1181,9 @@ function startAuthenticator() {
 
 function startPaypal() {
 	paypal.configure({
-		'mode': 'sandbox',
-		'client_id': 'AWG9ajryIqdfuyjZL2zYcbq70MKj8X1jF6Xy4kXwnovU08Yk_BHkGBYkrUq1t03EqbdLWN4FfqGlLufI',
-		'client_secret': 'EGtrgTRjv8w5vori_MtxMzQU0jy2u8ZLC4sbBRIqpYyub7LHxD5ubJ2ezKIO_CSTk2ozH3RBE-zEi97A'
+		'mode': 'live',
+		'client_id': 'AX0eZAxfX_jO4NaDREp5-cc_GEKfHUve1nLMl-MtDJdd-a0esC683L_GmGAND2yve4_pO36ZZ6ocvCQ7',
+		'client_secret': 'EHDR4YR5FxFn8vGQWGicBJWrPr-0ZheySTYmHUWDLkIurJ6MVxS6YgaxRjp56wk2UI-CCyo5AGIvGB9k'
 	})
 	console.log('PayPal Conectado')
 }
@@ -1491,7 +1491,7 @@ async function comandoAutorizar(interaction) {
 			.then(mongoUsers => mongoUsers.filter(userRegistrado => userRegistrado.userID == message.member.user.id))
 			.then(registros => registros.filter(registro => registro.plugin == pl))
 			.then(registroArray => {
-				if (registroArray[0] === undefined) {
+				if (!registroArray[0]) {
 					autorizarIp(pl, message, ip, isEnglish)
 				} else {
 					registroArray[0].remove()
@@ -1505,7 +1505,6 @@ async function comandoAutorizar(interaction) {
 				console.log(err)
 				message.reply(err | 'Error')
 			})
-		
 	} else {
 		message.reply(buildEmbed(true, interaction.author.user).setURL('').setTitle(isEnglish ? 'No Permission.' : 'Sem Permissão.').setDescription(isEnglish ? 'You don\'t have permission to authorize this plugin.\n\u200B' : 'Você não tem permissão para autorizar esse plugin.\n\u200B'))
 	}
@@ -1909,8 +1908,10 @@ async function isSafeMessage(message) {
 		keys: [
 			"valor"
 		]
+		
 	} */
 
+	
 	const isEnglish = isEnglishMember(await fetchMember(interaction.guild_id, interaction.member.user.id))
 
 	const titulo = isEnglish ? `You can't do that, @${message.author.username}!` : `Você não pode fazer isso, @${message.author.username}!`
@@ -1971,13 +1972,17 @@ async function isSafeMessage(message) {
 function buildEmbed(isError, user) {
 	let cor = isError || false
 	cor = isError ? ERRO_COR : SUCESSO_COR
-
-	return new MessageEmbed()
+	const returnEmbed = new MessageEmbed()
+	returnEmbed
 		.setTitle(`Placeholder title`)
 		.setColor(cor)
 		.setURL('https://discord.gg/pVTjJT9mXZ')
-		.setFooter(` • ${user.tag}`, user.displayAvatarURL({ format: 'png', size: 16 }))
-		.setTimestamp(new Date())
+	if (user) {
+		returnEmbed
+			.setFooter(` • ${user.tag}`, user.displayAvatarURL({ format: 'png', size: 16 }))
+			.setTimestamp(new Date())
+	}
+	return returnEmbed
 }
 
 function getLanguage(member) {
