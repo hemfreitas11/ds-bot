@@ -1073,6 +1073,7 @@ function getConstants() {
 			valor: ['6.90', '24.90', '5.90'],
 			moeda: ['USD', 'BRL', 'EUR'],
 			simbolo: ['$', 'R$', '€'],
+			versao_recente: '1.0',
 			pagar_channel: ['838975029504901150', '839156596947943424'],
 			categoria_channel: ['838800634286833776', '839156489511501894']
 		}
@@ -1164,8 +1165,13 @@ function startAuthenticator() {
 	app.get('/k1j2-39il-kjdc-ao03-90hf-a872', (req, res) => {
 		const clientIp = req.headers['x-forwarded-for']
 		const plugin = req.headers['plugin']
-		const trueResponse = `true-${clientIp}`
-		const falseResponse = `false-${clientIp}`
+		const version = req.headers['version']
+		const recent_version = pluginsCompraveis[plugin].versao_recente
+		const trueResponse = 'true'
+		if (version != recent_version) trueResponse += `_${recent_version}`
+		trueResponse += `-${clientIp}`
+		const falseResponse = 'false'
+		falseResponse += `-${clientIp}`
 		UserRegistrado.find()
 			.then(mongoUsers => mongoUsers.filter(userRegistrado => userRegistrado.allowedIP == clientIp))
 			.then(registros => registros.filter(registro => registro.plugin.toLowerCase() == plugin.toLowerCase()))
