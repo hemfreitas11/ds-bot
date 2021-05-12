@@ -1170,7 +1170,7 @@ function startAuthenticator() {
 		let trueResponse = 'true'
 		if (version != recent_version) trueResponse += `_${recent_version}`
 		trueResponse += `-${clientIp}`
-		const falseResponse = 'false'
+		let falseResponse = 'false'
 		falseResponse += `-${clientIp}`
 		UserRegistrado.find()
 			.then(mongoUsers => mongoUsers.filter(userRegistrado => userRegistrado.allowedIP == clientIp))
