@@ -1167,7 +1167,7 @@ function startAuthenticator() {
 		const plugin = req.headers['plugin']
 		const version = req.headers['version']
 		const recent_version = pluginsCompraveis[plugin].versao_recente
-		const trueResponse = 'true'
+		let trueResponse = 'true'
 		if (version != recent_version) trueResponse += `_${recent_version}`
 		trueResponse += `-${clientIp}`
 		const falseResponse = 'false'
