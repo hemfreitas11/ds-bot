@@ -25,6 +25,41 @@ client.on("ready", () => {
 		startBackend()
 		// startMutedManager()
 		// createCommands()
+		/* client.interactions
+			.createCommand({
+				name: "emoji",
+				description: "Use animated emojis without nitro.",
+				options: [
+					{
+						type: 3,
+						required: true,
+						name: 'emoji',
+						description: 'Emoji you want to send. You can send more than one at a time.'
+					}
+				]
+			}, ID_SERVIDOR)
+			.then(command => {
+				client.interactions.editCommandPermissions(
+					[
+						{
+							id: '805524037950373969',
+							type: 1,
+							permission: true,
+						},
+						{
+							id: '747513191059292240',
+							type: 1,
+							permission: true,
+						}
+					], ID_SERVIDOR, command.id
+				)
+			})
+			.then(result => { console.log('Created emojien command') })
+			.catch(error => {
+				console.log(error)
+				console.log(error.response.data)
+				console.log(error.response.data.errors.options['1'])
+			}) */
 	} catch (error) { console.log(error) }
 	/* client.interactions
 		.createCommand({
@@ -66,6 +101,9 @@ client.ws.on('INTERACTION_CREATE', async (interaction) => {
 		if(await isValidCommandChannel(interaction)) {
 			if (comando == 'comprar' || comando == 'buy') {
 				await comandoComprar(interaction)
+				channel.stopTyping()
+			} else if (comando == 'emoji') {
+				await comandoEmoji(interaction)
 				channel.stopTyping()
 			} else if (comando == 'autorizar' || comando == 'authorize') {
 				if (await hasValidOptions(interaction, 2)) {
@@ -126,7 +164,7 @@ client.on("messageReactionAdd", (reaction, user) => {
 						const pluginCompravel = getPluginCompravel(message.channel.name.split('-')[1])
 						
 						if (pluginCompravel == null) {
-							message.reply(buildEmbed(true, user).setTitle(isEnglish ? 'Unexpected error, contact **Bkr#1253**' : 'Erro Inexperado, entre em contato com **Bkr#1253**').setURL('').setDescription('Error #3\n\u200B'))
+							message.reply(buildEmbed(true, user).setTitle(`${getEmoji(guild, 'warn')} ` +isEnglish ? 'Unexpected error, contact **Bkr#1253**' : 'Erro Inexperado, entre em contato com **Bkr#1253**').setURL('').setDescription('Error #3\n\u200B'))
 							return
 						}
 						
@@ -144,7 +182,7 @@ client.on("messageReactionAdd", (reaction, user) => {
 													let userComprando = registroArray[0]
 													
 													if (userComprando == null || userComprando == undefined) {
-														message.reply(buildEmbed(true, user).setTitle(isEnglish ? 'Unexpected error, contact **Bkr#1253**' : 'Erro Inexperado, entre em contato com **Bkr#1253**').setURL('').setDescription('Error #4\n\u200B'))
+														message.reply(buildEmbed(true, user).setTitle(`${getEmoji(guild, 'warn')} ` + (isEnglish ? 'Unexpected error, contact **Bkr#1253**' : 'Erro Inexperado, entre em contato com **Bkr#1253**')).setURL('').setDescription('Error #4\n\u200B'))
 														return
 													}
 													let { moeda, simbolo, valor } = getPaymentInfo(emoji, pluginCompravel, userComprando)
@@ -157,7 +195,7 @@ client.on("messageReactionAdd", (reaction, user) => {
 															if (moeda != null) {
 																message.channel.send(new MessageEmbed()
 																	.setTitle(isEnglish ? confirmTitle[0] : confirmTitle[1])
-																	.setThumbnail('https://i.imgur.com/aWQ9aBT.png')
+																	.setThumbnail('https://c.imgur.com/aWQ9aBT.png')
 																	.setDescription(isEnglish ? confirmDescription[0] : confirmDescription[1])
 																	.setColor('#0443C1')
 																	.setURL('')
@@ -168,7 +206,7 @@ client.on("messageReactionAdd", (reaction, user) => {
 																	})
 																	.catch(error => { console.log(error) })
 															} else {
-																message.reply(buildEmbed(true, user).setTitle(isEnglish ? 'Unexpected error, contact **Bkr#1253**' : 'Erro Inexperado, entre em contato com **Bkr#1253**').setURL('').setDescription(err))
+																message.reply(buildEmbed(true, user).setTitle(`${getEmoji(guild, 'warn')} ` + (isEnglish ? 'Unexpected error, contact **Bkr#1253**' : 'Erro Inexperado, entre em contato com **Bkr#1253**')).setURL('').setDescription(err))
 															}
 														})
 												}
@@ -181,7 +219,7 @@ client.on("messageReactionAdd", (reaction, user) => {
 										const generatingTitle = ['Generating', 'Gerando']
 										const generatingDescription = ['Generating payment link, this might take a few seconds...', 'Gerando link de pagamento, isso pode demorar alguns segundos...']
 
-										message.reply(buildEmbed(false, user).setTitle(isEnglish ? generatingTitle[0] : generatingTitle[1]).setURL('').setColor('#0443C1').setDescription(isEnglish ? generatingDescription[0] : generatingDescription[1])
+										message.reply(buildEmbed(false, user).setTitle((isEnglish ? generatingTitle[0] : generatingTitle[1])).setURL('').setColor('#0443C1').setDescription(isEnglish ? generatingDescription[0] : generatingDescription[1])
 										.setFooter('')
 										.setTimestamp(null))					
 										UsuarioComprando.find()
@@ -192,7 +230,7 @@ client.on("messageReactionAdd", (reaction, user) => {
 													let userComprando = registroArray[0]
 													
 													if (userComprando == null || userComprando == undefined) {
-														message.reply(buildEmbed(true, user).setTitle(isEnglish ? 'Unexpected error, contact **Bkr#1253**' : 'Erro Inexperado, entre em contato com **Bkr#1253**').setURL('').setDescription('Error #4\n\u200B'))
+														message.reply(buildEmbed(true, user).setTitle(`${getEmoji(guild, 'warn')} ` + (isEnglish ? 'Unexpected error, contact **Bkr#1253**' : 'Erro Inexperado, entre em contato com **Bkr#1253**')).setURL('').setDescription('Error #4\n\u200B'))
 														return
 													}
 					
@@ -202,7 +240,7 @@ client.on("messageReactionAdd", (reaction, user) => {
 													let currencyIndex = getCurrencyIndex(currency)
 													
 													if (currencyIndex == null) {
-														message.reply(buildEmbed(true, user).setTitle(isEnglish ? 'Unexpected error, contact **Bkr#1253**' : 'Erro Inexperado, entre em contato com **Bkr#1253**').setURL('').setDescription('Error #9\n\u200B'))
+														message.reply(buildEmbed(true, user).setTitle(`${getEmoji(guild, 'warn')} ` + (isEnglish ? 'Unexpected error, contact **Bkr#1253**' : 'Erro Inexperado, entre em contato com **Bkr#1253**')).setURL('').setDescription('Error #9\n\u200B'))
 														return
 													}
 					
@@ -213,20 +251,20 @@ client.on("messageReactionAdd", (reaction, user) => {
 													const create_payment_json = createPaymentJson(successUrl, cancelUrl, plugin_name, price, currency, discord_id)
 													
 													if (discord_id == null || discord_id == undefined) {
-														message.reply(buildEmbed(true, user).setTitle(isEnglish ? 'Unexpected error, contact **Bkr#1253**' : 'Erro Inexperado, entre em contato com **Bkr#1253**').setURL('').setDescription('Error #46\n\u200B'))
+														message.reply(buildEmbed(true, user).setTitle(`${getEmoji(guild, 'warn')} ` + (isEnglish ? 'Unexpected error, contact **Bkr#1253**' : 'Erro Inexperado, entre em contato com **Bkr#1253**')).setURL('').setDescription('Error #46\n\u200B'))
 														return
 													}
 					
 													paypal.payment.create(create_payment_json, function (error, payment) {
 														if (error) {
-															message.reply(buildEmbed(true, user).setTitle(isEnglish ? 'Unexpected error, contact **Bkr#1253**' : 'Erro Inexperado, entre em contato com **Bkr#1253**').setURL('').setDescription(error))
+															message.reply(buildEmbed(true, user).setTitle(`${getEmoji(guild, 'warn')} ` + (isEnglish ? 'Unexpected error, contact **Bkr#1253**' : 'Erro Inexperado, entre em contato com **Bkr#1253**')).setURL('').setDescription(error))
 															console.log(error)
 														} else {
-															for(let i = 0;i < payment.links.length; i++){
-																if(payment.links[i].rel === 'approval_url'){
+															for(let c = 0;c < payment.links.length; c++){
+																if(payment.links[c].rel === 'approval_url'){
 																	const paymentTitle = ['Payment link created', 'Link de pagamento criado']
-																	const paymentDescription = [`The payment is 100% secure and made entirely inside of PayPal. \n\nYour payment info is **NEVER** sent to me.\n\nClick the link bellow to open the browser and make the payment with PayPal: \n${payment.links[i].href}`, `O pagamento é 100% seguro e realizado inteiramente dentro do Paypal. \n\nSuas informações de pagamento **NUNCA** serão enviados para mim.\n\nClique no link abaixo para abrir o navegador e efetuar o pagamento através do PayPal:\n${payment.links[i].href}`]
-																	message.reply(buildEmbed(false, user).setTitle(isEnglish ? paymentTitle[0] : paymentTitle[1]).setURL('').setDescription(`${isEnglish ? paymentDescription[0] : paymentDescription[1]}\n\u200B`)
+																	const paymentDescription = [`The payment is 100% secure and made entirely inside of PayPal. \n\nYour payment info is **NEVER** sent to me.\n\nClick the link bellow to open the browser and make the payment with PayPal: \n${payment.links[c].href}`, `O pagamento é 100% seguro e realizado inteiramente dentro do Paypal. \n\nSuas informações de pagamento **NUNCA** serão enviados para mim.\n\nClique no link abaixo para abrir o navegador e efetuar o pagamento através do PayPal:\n${payment.links[c].href}`]
+																	message.reply(buildEmbed(false, user).setTitle(`${getEmoji(guild, 'Tick_green')}` + (isEnglish ? paymentTitle[0] : paymentTitle[1])).setURL('').setDescription(`${isEnglish ? paymentDescription[0] : paymentDescription[1]}\n\u200B`)
 																	.setFooter('')
 																	.setTimestamp(null))
 																}
@@ -241,7 +279,7 @@ client.on("messageReactionAdd", (reaction, user) => {
 											})
 									}
 								} else {
-									message.reply(buildEmbed(true, user).setTitle(isEnglish ? '**Error**' : '**Erro**').setURL('').setDescription(isEnglish ? 'Thanks, but you already bought this plugin!\n\u200B' : 'Obrigado, mas você já comprou este plugin!\n\u200B'))
+									message.reply(buildEmbed(true, user).setTitle(`${getEmoji(guild, 'warn')} ` + (isEnglish ? '**Error**' : '**Erro**')).setURL('').setDescription(isEnglish ? 'Thanks, but you already bought this plugin!\n\u200B' : 'Obrigado, mas você já comprou este plugin!\n\u200B'))
 								}
 							})
 							.catch(err => {
@@ -313,7 +351,7 @@ async function isValidCommandChannel(interaction) {
 		returnValue = true
 	} else {
 		const isEnglish = isEnglishMember(await fetchMember(interaction.guild_id, interaction.member.user.id))
-		interaction.reply(buildEmbed(true, interaction.author.user).setURL('').setTitle(isEnglish ? 'Invalid Channel' : 'Canal Inválido').setDescription(isEnglish ? `You can use commands in the channels: \n\n<#805668906480042026>, <#805668772870357002>, <#805668197457592341>, <#838975029504901150>\n and the "Bugs" channel of any plugin\n\u200B` : `Você pode usar comandos nos canais: \n\n<#747496262441369640>, <#747498746526564512>, <#778332211090423838>, <#839156596947943424>\n e no canal "Bugs" de qualquer plugin\n\u200B`))
+		interaction.reply(buildEmbed(true, interaction.author.user).setURL('').setTitle(`${getEmoji(interaction.guild, 'warn')} ` + (isEnglish ? 'Invalid Channel' : 'Canal Inválido')).setDescription(isEnglish ? `You can use commands in the channels: \n\n<#805668906480042026>, <#805668772870357002>, <#805668197457592341>, <#838975029504901150>\n and the "Bugs" channel of any plugin\n\u200B` : `Você pode usar comandos nos canais: \n\n<#747496262441369640>, <#747498746526564512>, <#778332211090423838>, <#839156596947943424>\n e no canal "Bugs" de qualquer plugin\n\u200B`))
 	}
 	return returnValue
 }
@@ -1094,8 +1132,8 @@ async function howToBuyMessage(interaction) {
 		buildEmbed(false, interaction.author.user)
 			.setDescription(desc)
 			.setURL('')
-			.setTitle(title)
-			.setThumbnail('https://i.imgur.com/aWQ9aBT.png')
+			.setTitle(`${getEmoji(interaction.guild, 'Tick_green')}` + title)
+			.setThumbnail('https://c.imgur.com/aWQ9aBT.png')
 	)
 	interaction.reply('001')
 }
@@ -1113,7 +1151,7 @@ async function languageSelectMessage(interaction) {
 			{ name: '**Português**', value: 'Clique na reação 🇧🇷 abaixo dessa mensagem para colocar o seu idioma como Português.', inline: true },
 			{ name: '\u200B', value: '\u200B' }
 		)
-		.setThumbnail('https://i.imgur.com/aWQ9aBT.png')
+		.setThumbnail('https://c.imgur.com/aWQ9aBT.png')
 		.setFooter('Bkr#1253 - http://bit.ly/bk-plugins')
 	]})
 		.then(message => {
@@ -1387,7 +1425,7 @@ async function comandoAjuda(interaction) {
 			{embeds: [
 				buildEmbed(false, interaction.author.user)
 				.setURL('')
-				.setTitle(title)
+				.setTitle(`${getEmoji(interaction.guild, 'Tick_green')}` + title)
 				.setDescription(`\u200b\n***${sugested}:*** \n*/${help} ${comandos[1] ? comandos[1].item.nome[key] : '-'} \u200b /${help} ${comandos[2] ? comandos[2].item.nome[key] : '-'} \u200b /${help} ${comandos[3] ? comandos[3].item.nome[key] : '-'} \u200b /${help} ${comandos[4] ? comandos[4].item.nome[key] : '-'}*\n\u200b\n`)
 				.addFields(
 					{ name: cmdTitle, value: `***Plugin***: ${comando.plugin[key]}\n***${desc}***: ${comando.desc[key]}\n***${usage}***: ${comando.uso[key]}\n***${perm}***: ${comando.perm}\n\u200b\n` }
@@ -1403,7 +1441,7 @@ async function comandoAjuda(interaction) {
 			{embeds: [
 				buildEmbed(true, interaction.author.user)
 				.setURL('')
-				.setTitle(title)
+				.setTitle(`${getEmoji(interaction.guild, 'warn')} ` + title)
 				.addFields(
 					{ name: n, value: v }
 				)
@@ -1417,7 +1455,7 @@ async function comandoBug(interaction) {
 	const message = interaction
 
 	let title = isEnglish ? 'How To Report A Bug' : 'Como Reportar Um Bug'
-	let titl = isEnglish ? `Hi there, i'm here to help!` : `Olá, eu estou aqui para ajudar!`
+	let titl = isEnglish ? `Hi there, c'm here to help!` : `Olá, eu estou aqui para ajudar!`
 	let cmdTitle = isEnglish ? `To ensure the problem is properly described, plese fill the form bellow with the details of the bug.` : `Para garantir que o problema seja descrito de forma correta, preencha o formulário abaixo com os detalhes do bug.`
 	let desc = isEnglish ? 'Short description of the problem' : 'Pequena descrição do problema'
 	let usage = isEnglish ? 'Did you try to do anything to fix it? If yes, what?' : 'Você tentou fazer algo para arrumar o bug? Se sim, o que?'
@@ -1431,8 +1469,8 @@ async function comandoBug(interaction) {
 				{ name: `\u200b\n${titl}`, value: cmdTitle },
 				{ name: '\u200b', value: `**Plugin**:\n**${desc}**:\n**${usage}**:\n**${perm}**:\n**${help}**:\n\u200b\n` }
 			)
-			.setTitle(title)
-			.setThumbnail('https://i.imgur.com/aWQ9aBT.png')
+			.setTitle(`${getEmoji(interaction.guild, 'Tick_green')}` + title)
+			.setThumbnail('https://c.imgur.com/aWQ9aBT.png')
 	)
 }
 
@@ -1448,7 +1486,7 @@ async function hasValidOptions(interaction, amount) {
 	}
 	if (returnValue == false) {
 		const isEnglish = isEnglishMember(await fetchMember(interaction.guild_id, interaction.member.user.id))
-		interaction.reply(buildEmbed(true, interaction.author.user).setURL('').setTitle(isEnglish ? 'Invalid Options' : 'You didn\'t type the required options').setDescription(isEnglish ? 'Opções inválidas\n\u200B' : 'Você não digitou as opções nescessárias\n\u200B'))
+		interaction.reply(buildEmbed(true, interaction.author.user).setURL('').setTitle(`${getEmoji(interaction.guild, 'warn')} ` + (isEnglish ? 'Invalid Options' : 'You didn\'t type the required options')).setDescription(isEnglish ? 'Opções inválidas\n\u200B' : 'Você não digitou as opções nescessárias\n\u200B'))
 	}
 	return returnValue
 }
@@ -1463,13 +1501,13 @@ async function comandoDesautorizar(interaction) {
 		.then(registroArray => {
 			if (registroArray[0] === undefined) {
 				message.reply({embeds: [
-					buildEmbed(true, interaction.author.user).setTitle(isEnglish ? 'Error' : 'Erro').setURL('').setDescription(isEnglish ? `You don\'t have an authorization for the plugin **${pl}**\n\u200B` : `Você não tem uma autorização no plugin **${pl}**\n\u200B`)
+					buildEmbed(true, interaction.author.user).setTitle(`${getEmoji(interaction.guild, 'warn')} ` + (isEnglish ? 'Error' : 'Erro')).setURL('').setDescription(isEnglish ? `You don\'t have an authorization for the plugin **${pl}**\n\u200B` : `Você não tem uma autorização no plugin **${pl}**\n\u200B`)
 				]})
 			} else {
 				const ip = registroArray[0].allowedIP
 				registroArray[0].remove()
 				message.reply({embeds: [
-					buildEmbed(false, interaction.author.user).setTitle(isEnglish ? 'Success' : 'Sucesso').setURL('').setDescription(isEnglish ? `You removed the authorization of the IP **${ip}** from the plugin **${pl}**\n\u200B` : `Você retirou a sua autorização do ip **${ip}** no plugin **${pl}**\n\u200B`)
+					buildEmbed(false, interaction.author.user).setTitle(`${getEmoji(interaction.guild, 'Tick_green')}` + (isEnglish ? 'Success' : 'Sucesso')).setURL('').setDescription(isEnglish ? `You removed the authorization of the IP **${ip}** from the plugin **${pl}**\n\u200B` : `Você retirou a sua autorização do ip **${ip}** no plugin **${pl}**\n\u200B`)
 				]})
 			}
 		})
@@ -1477,6 +1515,73 @@ async function comandoDesautorizar(interaction) {
 			console.log(err)
 			message.reply(err | 'Error')
 		})
+}
+
+async function comandoEmoji(interaction) {
+	const message = interaction
+	const member = await fetchMember(interaction.guild_id, interaction.member.user.id)
+	const isEnglish = isEnglishMember(member)
+	
+	let emojis = interaction.data.options[0].value.toLowerCase().replace(':', '').split(' ')
+	let finalMessage = ''
+
+	emojiCache = []
+
+	for (let c = 0; c < emojis.length; c++) {
+		let emojiId = null
+		
+		emojiCache.forEach(emoji => {
+			if (emoji) {
+				if (emoji.name == emojis[c]) emojiId = emoji.id
+			}
+		})
+		
+		if (emojiId == null) {
+			interaction.guild.emojis.cache.each(emoji => {
+				if (emojis[c] == emoji.name) {
+					emojiId = emoji.id
+					emojiCache.push({
+						name: emoji.name,
+						id: emoji.id
+					})
+				}
+			})
+		}
+		
+		if (!emojiId) emojis[c] = null
+		else {
+			finalMessage += `<a:${emojis[c]}:${emojiId}> `
+		}
+
+	}
+	
+	if (finalMessage == '' || finalMessage == null || finalMessage == undefined) {
+		message.reply(buildEmbed(true, interaction.author.user).setURL('').setTitle(`${getEmoji(interaction.guild, 'warn')} ` + (isEnglish ? 'Emoji not found' : 'Emoji não encontrado')))
+			.then(result => {
+				setTimeout(() => {
+					message.delete()
+				}, 5000)
+			})
+	} else {
+		if (finalMessage.length >= 2048) {
+			message.reply(buildEmbed(true, interaction.author.user).setURL('').setTitle(`${getEmoji(interaction.guild, 'warn')} ` + (isEnglish ? 'Too many emojis' : 'Emojis demais')))
+		} else {
+			message.reply(buildEmbed(false).setAuthor(`${message.author.user.username}:`, message.author.user.displayAvatarURL({ format: 'png', size: 16 })).setURL('').setColor('#36393f').setTitle('\u200B').setDescription(finalMessage))
+		}
+	}
+	
+}
+
+function getEmoji(guild, emojiName) {
+	let emojiId = null
+
+	guild.emojis.cache.each(emoji => {
+		if (emojiName == emoji.name) {
+			emojiId = emoji.id
+		}
+	})
+	
+	return emojiId ? `<a:${emojiName}:${emojiId}> ` : ''
 }
 
 async function comandoAutorizar(interaction) {
@@ -1492,7 +1597,7 @@ async function comandoAutorizar(interaction) {
 			break;
 	}
 	if (!role) {
-		message.reply(buildEmbed(true, interaction.author.user).setURL('').setTitle(isEnglish ? 'No Permission' : 'Sem Permissão').setDescription(isEnglish ? 'You don\'t have permission to authorize this plugin.\n\u200B' : 'Você não tem permissão para autorizar esse plugin.\n\u200B'))
+		message.reply(buildEmbed(true, interaction.author.user).setURL('').setTitle(`${getEmoji(interaction.guild, 'warn')} ` + (isEnglish ? 'No Permission' : 'Sem Permissão')).setDescription(isEnglish ? 'You don\'t have permission to authorize this plugin.\n\u200B' : 'Você não tem permissão para autorizar esse plugin.\n\u200B'))
 		return
 	}
 	
@@ -1516,7 +1621,7 @@ async function comandoAutorizar(interaction) {
 				message.reply(err | 'Error')
 			})
 	} else {
-		message.reply(buildEmbed(true, interaction.author.user).setURL('').setTitle(isEnglish ? 'No Permission.' : 'Sem Permissão.').setDescription(isEnglish ? 'You don\'t have permission to authorize this plugin.\n\u200B' : 'Você não tem permissão para autorizar esse plugin.\n\u200B'))
+		message.reply(buildEmbed(true, interaction.author.user).setURL('').setTitle(`${getEmoji(message.guild, 'warn')} ` + (isEnglish ? 'No Permission.' : 'Sem Permissão.')).setDescription(isEnglish ? 'You don\'t have permission to authorize this plugin.\n\u200B' : 'Você não tem permissão para autorizar esse plugin.\n\u200B'))
 	}
 
 	/* if (args.length == 2) {
@@ -1540,16 +1645,17 @@ function autorizarIp(pl, message, ip, isEnglish) {
 	})
 	regUser.save()
 		.then(result => {
+			console.log(getEmoji(message.guild, 'Tick_green'))
 			message.reply({
 				embeds: [
-					buildEmbed(false, message.author.user).setTitle(isEnglish ? 'Success' : 'Sucesso').setURL('').setDescription(isEnglish ? `You sucessfuly authorized the IP **${ip}** for the plugin **${pl}**!\n\u200B`: `Você autorizou o ip **${ip}** no plugin **${pl}** com sucesso!\n\u200B`)
+					buildEmbed(false, message.author.user).setTitle(`${getEmoji(message.guild, 'Tick_green')}` + (isEnglish ? 'Success' : 'Sucesso')).setURL('').setDescription(isEnglish ? `You sucessfuly authorized the IP **${ip}** for the plugin **${pl}**!\n\u200B`: `Você autorizou o ip **${ip}** no plugin **${pl}** com sucesso!\n\u200B`)
 				]
 			})
 		})
 		.catch(err => {
 			message.reply({
 				embeds: [
-					buildEmbed(true, message.author.user).setTitle(isEnglish ? 'Unexpected error, contact **Bkr#1253**' : 'Erro Inexperado, entre em contato com **Bkr#1253**').setURL('').setDescription(err)
+					buildEmbed(true, message.author.user).setTitle(isEnglish ? `${getEmoji(message.guild, 'warn')} Unexpected error, contact **Bkr#1253**` : `${getEmoji(message.guild, 'warn')} Erro Inexperado, entre em contato com **Bkr#1253**`).setURL('').setDescription(err)
 				]
 			})
 		})
@@ -1594,13 +1700,13 @@ async function comandoComprar(interaction) {
 						})
 				} else {
 					interaction.reply({embeds: [
-						buildEmbed(true, interaction.author.user).setTitle(isEnglish ? '**Error**' : '**Erro**').setURL('').setDescription(isEnglish ? 'Thanks, but you already bought this plugin!\n\u200B' : 'Obrigado, mas você já comprou este plugin!\n\u200B')
+						buildEmbed(true, interaction.author.user).setTitle(`${getEmoji(message.guild, 'warn')} ` + (isEnglish ? '**Error**' : '**Erro**')).setURL('').setDescription(isEnglish ? 'Thanks, but you already bought this plugin!\n\u200B' : 'Obrigado, mas você já comprou este plugin!\n\u200B')
 					]})
 				}
 			})
 	} else {
 		interaction.reply({
-			embeds: [buildEmbed(true, interaction.author.user).setTitle(isEnglish ? '**Error**' : '**Erro**').setURL('').setDescription(isEnglish ? 'You are not in the "Buy" channel of any plugin!\n\u200B' : 'Você não está no canal "Comprar" de nenhum plugin!\n\u200B')]
+			embeds: [buildEmbed(true, interaction.author.user).setTitle(`${getEmoji(message.guild, 'warn')} ` + (isEnglish ? '**Error**' : '**Erro**')).setURL('').setDescription(isEnglish ? `You are not in the "Buy" channel of any plugin!\n\u200B` : `Você não está no canal "Comprar" de nenhum plugin!\n\u200B`)]
 		})
 	}
 }
@@ -1646,7 +1752,7 @@ function executePayment(error, payment, res) {
 											member.roles.add(getPurchasedRole(pluginName, isEnglish))
 
 											const mens = new MessageEmbed()
-												.setTitle(isEnglish ? successTitle[0] : successTitle[1])
+												.setTitle(`${getEmoji(member.guild, 'greentick')}` + (isEnglish ? successTitle[0] : successTitle[1]))
 												.setDescription(isEnglish ? successDescription[0] : successDescription[1])
 												.setColor('#2AFF00')
 												.setURL('')
@@ -1664,7 +1770,7 @@ function executePayment(error, payment, res) {
 													{ name: `**${isEnglish ? pag_id[0] : pag_id[1]}**`, value: `${payment.id.replace('PAYID-', '')}`, inline: true },
 													{ name: '\u200B', value: '\u200B', inline: true }
 												)
-												.setThumbnail('https://i.imgur.com/aWQ9aBT.png')
+												.setThumbnail('https://c.imgur.com/aWQ9aBT.png')
 											channel.send(mens)
 											member.send(mens)
 										})
@@ -1743,7 +1849,7 @@ function startBuyAction(isEnglish, message, pluginCompravel) {
 						const isEnglish = isEnglishMember(await fetchMember(message.guild_id, message.member.user.id))
 
 						const private_channel_title = ['Private Channel', 'Canal Privado']
-						const private_channel_desc = [`Hey <@${message.member.user.id}>, i'm here! \n\nOnly you can see this channel, it will be deleted automatically after 7 days...`, `Ei <@${message.member.user.id}>, eu estou aqui! \n\nSó você pode visualizar esse canal, ele será deletado automaticamente após 7 dias...`]
+						const private_channel_desc = [`Hey <@${message.member.user.id}>, c'm here! \n\nOnly you can see this channel, it will be deleted automatically after 7 days...`, `Ei <@${message.member.user.id}>, eu estou aqui! \n\nSó você pode visualizar esse canal, ele será deletado automaticamente após 7 dias...`]
 						const starting_title = [`Starting purchase of the plugin ${pluginCompravel.nome[0]}`, `Iniciando a compra do plugin ${pluginCompravel.nome[1]}`]
 						const starting_desc = [`\nThe proccess is very simple and 100% automatic, you don't have to send me any payment receipt to receive your plugin.\n\nYou will get access to the plugin download and the activation command instantaneously after the purchase is complete.\n\nLet's go: To begin, select your currency in the reactions bellow'`, `\nO processo é bem simples e 100% automático, sem ter que ficar enviando comprovantes pra lá e pra cá\n\nVocê receberá o acesso ao download do plugin e ao comando de ativação instantaneamente após a confirmação do pagamento\n\nVamos lá: pra começar, selecione a sua moeda nas reações abaixo'`]
 
@@ -1752,7 +1858,7 @@ function startBuyAction(isEnglish, message, pluginCompravel) {
 							.setDescription(`${isEnglish ? private_channel_desc[0] : private_channel_desc[1]}`)
 							.setColor('#0443C1')
 							.setURL('')
-							.setThumbnail('https://i.imgur.com/aWQ9aBT.png')
+							.setThumbnail('https://c.imgur.com/aWQ9aBT.png')
 						)
 							.then(result => {
 								message.delete()
@@ -1767,7 +1873,7 @@ function startBuyAction(isEnglish, message, pluginCompravel) {
 										{ name: '**BRL | Real Brasileiro**', value: 'Clique na reação 🇧🇷 abaixo dessa mensagem para definir a moeda como BRL.', inline: true },
 										{ name: '**EUR | European Euro**', value: 'Click the 🇪🇺 reaction bellow this message to set the currency to EUR.', inline: true }
 									)
-									.setThumbnail('https://i.imgur.com/aWQ9aBT.png')
+									.setThumbnail('https://c.imgur.com/aWQ9aBT.png')
 								)
 									.then(message => {
 										message.react('🇺🇸')
@@ -1785,7 +1891,7 @@ function startBuyAction(isEnglish, message, pluginCompravel) {
 							})
 					})
 					.catch(err => {
-						message.reply({embeds: [buildEmbed(true, interaction.author.user).setTitle(isEnglish ? 'Unnexpected error, contact **Bkr#1253**' : 'Erro Inexperado, entre em contato com **Bkr#1253**').setURL('').setDescription(err)]})
+						message.reply({embeds: [buildEmbed(true, interaction.author.user).setTitle(`${getEmoji(message.guild, 'warn')} ` + (isEnglish ? 'Unnexpected error, contact **Bkr#1253**' : 'Erro Inexperado, entre em contato com **Bkr#1253**')).setURL('').setDescription(err)]})
 						console.log(err)
 					})
 			})
@@ -1932,7 +2038,7 @@ async function isSafeMessage(message) {
 		message.reply({embeds: [
 			buildEmbed(true, interaction.author.user)
 			.setURL('')
-			.setTitle(titulo)
+			.setTitle(`${getEmoji(message.guild, 'warn')} ` + titulo)
 			.setDescription(desc)]})
 		// mutedUsers.users.push({info:message.member.user, hours:1})
 		message.delete()
@@ -2005,8 +2111,9 @@ function isEnglishMember(member) {
 }
 
 function ptMsg(user) {
+	const guild = client.guilds.cache.get(interaction.guild_id)
 	return new MessageEmbed()
-		.setTitle(`Bem-vindo(a)!`)
+		.setTitle(`${getEmoji(guild, 'blobjoin')}` + `Bem-vindo(a)!` + `${getEmoji(guild, 'blobjoin')}`)
 		.setDescription(`Seja bem-vindo(a) ao BkStore, <@${user.id}>! Nesse servidor você pode encomendar, comprar e receber suporte para meus plugins!`)
 		.setColor('#0443C1')
 		.setURL('https://discord.gg/pVTjJT9mXZ')
@@ -2026,8 +2133,9 @@ function ptMsg(user) {
 }
 
 function engMsg(user) {
+	const guild = client.guilds.cache.get(interaction.guild_id)
 	return new MessageEmbed()
-		.setTitle(`Welcome!`)
+		.setTitle(`${getEmoji(guild, 'blobjoin')}` + `Welcome!` + `${getEmoji(guild, 'blobjoin')}`)
 		.setDescription(`Welcome to BkStore, <@${user.id}>! In this server can order, buy and receive support for my plugins!`)
 		.setColor('#0443C1')
 		.setURL('https://discord.gg/pVTjJT9mXZ')
@@ -2035,7 +2143,7 @@ function engMsg(user) {
 			{ name: '\u200B', value: '\u200B' },
 			{ name: 'Error Support', value: 'Post you problem in the #Bugs channel from the plugin you wish to receive help for.' },
 			{ name: '\u200B', value: '\u200B' },
-			{ name: 'Sugestions are always welcome', value: 'Leave your sugestions about what i can improve in the #Sugestions channel.' },
+			{ name: 'Sugestions are always welcome', value: 'Leave your sugestions about what c can improve in the #Sugestions channel.' },
 			{ name: '\u200B', value: '\u200B' },
 			{ name: 'Rules', value: 'In the channel <#747495985378361356> you will be able to find the server rules.', inline: true },
 			{ name: 'Order Plugins', value: 'Here in the channel <#805668197457592341> you can order plugins.', inline: true },
