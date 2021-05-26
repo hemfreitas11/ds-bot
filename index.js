@@ -1225,9 +1225,9 @@ function startAuthenticator() {
 
 function startPaypal() {
 	paypal.configure({
-		'mode': 'live',
-		'client_id': 'AX0eZAxfX_jO4NaDREp5-cc_GEKfHUve1nLMl-MtDJdd-a0esC683L_GmGAND2yve4_pO36ZZ6ocvCQ7',
-		'client_secret': 'EHDR4YR5FxFn8vGQWGicBJWrPr-0ZheySTYmHUWDLkIurJ6MVxS6YgaxRjp56wk2UI-CCyo5AGIvGB9k'
+		'mode': 'sandbox',
+		'client_id': 'AWG9ajryIqdfuyjZL2zYcbq70MKj8X1jF6Xy4kXwnovU08Yk_BHkGBYkrUq1t03EqbdLWN4FfqGlLufI',
+		'client_secret': 'EGtrgTRjv8w5vori_MtxMzQU0jy2u8ZLC4sbBRIqpYyub7LHxD5ubJ2ezKIO_CSTk2ozH3RBE-zEi97A'
 	})
 	console.log('PayPal Conectado')
 }
