@@ -1891,7 +1891,7 @@ function startBuyAction(isEnglish, message, pluginCompravel) {
 							})
 					})
 					.catch(err => {
-						message.reply({embeds: [buildEmbed(true, interaction.author.user).setTitle(`${getEmoji(message.guild, 'warn')} ` + (isEnglish ? 'Unnexpected error, contact **Bkr#1253**' : 'Erro Inexperado, entre em contato com **Bkr#1253**')).setURL('').setDescription(err)]})
+						message.reply({embeds: [buildEmbed(true, message.author.user).setTitle(`${getEmoji(message.guild, 'warn')} ` + (isEnglish ? 'Unnexpected error, contact **Bkr#1253**' : 'Erro Inexperado, entre em contato com **Bkr#1253**')).setURL('').setDescription(err)]})
 						console.log(err)
 					})
 			})
@@ -2028,7 +2028,7 @@ async function isSafeMessage(message) {
 	} */
 
 	
-	const isEnglish = isEnglishMember(await fetchMember(interaction.guild_id, interaction.member.user.id))
+	const isEnglish = isEnglishMember(await fetchMember(ID_SERVIDOR, message.member.user.id))
 
 	const titulo = isEnglish ? `You can't do that, @${message.author.username}!` : `Você não pode fazer isso, @${message.author.username}!`
 	const desc = isEnglish ? 'A link was detected in your message and you will be punished if you continue to send it.\n\u200B' : 'Um link foi detectado na sua mensagem e você será punido se continuar a envia-lo.\n\u200B'
@@ -2036,7 +2036,7 @@ async function isSafeMessage(message) {
 
 	const notSafe = () => {
 		message.reply({embeds: [
-			buildEmbed(true, interaction.author.user)
+			buildEmbed(true, message.author.user)
 			.setURL('')
 			.setTitle(`${getEmoji(message.guild, 'warn')} ` + titulo)
 			.setDescription(desc)]})
@@ -2111,7 +2111,7 @@ function isEnglishMember(member) {
 }
 
 function ptMsg(user) {
-	const guild = client.guilds.cache.get(interaction.guild_id)
+	const guild = client.guilds.cache.get(ID_SERVIDOR)
 	return new MessageEmbed()
 		.setTitle(`${getEmoji(guild, 'blobjoin')}` + `Bem-vindo(a)!` + `${getEmoji(guild, 'blobjoin')}`)
 		.setDescription(`Seja bem-vindo(a) ao BkStore, <@${user.id}>! Nesse servidor você pode encomendar, comprar e receber suporte para meus plugins!`)
@@ -2133,7 +2133,7 @@ function ptMsg(user) {
 }
 
 function engMsg(user) {
-	const guild = client.guilds.cache.get(interaction.guild_id)
+	const guild = client.guilds.cache.get(ID_SERVIDOR)
 	return new MessageEmbed()
 		.setTitle(`${getEmoji(guild, 'blobjoin')}` + `Welcome!` + `${getEmoji(guild, 'blobjoin')}`)
 		.setDescription(`Welcome to BkStore, <@${user.id}>! In this server can order, buy and receive support for my plugins!`)
