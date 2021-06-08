@@ -2113,7 +2113,7 @@ function isEnglishMember(member) {
 function ptMsg(user) {
 	const guild = client.guilds.cache.get(ID_SERVIDOR)
 	return new MessageEmbed()
-		.setTitle(`${getEmoji(guild, 'blobjoin')}` + `Bem-vindo(a)!` + `${getEmoji(guild, 'blobjoin')}`)
+		.setTitle(`${getEmoji(guild, 'blobjoin')}` + `Bem-vindo(a)! ` + `${getEmoji(guild, 'blobjoin')}`)
 		.setDescription(`Seja bem-vindo(a) ao BkStore, <@${user.id}>! Nesse servidor você pode encomendar, comprar e receber suporte para meus plugins!`)
 		.setColor('#0443C1')
 		.setURL('https://discord.gg/pVTjJT9mXZ')
@@ -2135,7 +2135,7 @@ function ptMsg(user) {
 function engMsg(user) {
 	const guild = client.guilds.cache.get(ID_SERVIDOR)
 	return new MessageEmbed()
-		.setTitle(`${getEmoji(guild, 'blobjoin')}` + `Welcome!` + `${getEmoji(guild, 'blobjoin')}`)
+		.setTitle(`${getEmoji(guild, 'blobjoin')}` + `Welcome! ` + `${getEmoji(guild, 'blobjoin')}`)
 		.setDescription(`Welcome to BkStore, <@${user.id}>! In this server can order, buy and receive support for my plugins!`)
 		.setColor('#0443C1')
 		.setURL('https://discord.gg/pVTjJT9mXZ')
@@ -2143,7 +2143,7 @@ function engMsg(user) {
 			{ name: '\u200B', value: '\u200B' },
 			{ name: 'Error Support', value: 'Post you problem in the #Bugs channel from the plugin you wish to receive help for.' },
 			{ name: '\u200B', value: '\u200B' },
-			{ name: 'Sugestions are always welcome', value: 'Leave your sugestions about what c can improve in the #Sugestions channel.' },
+			{ name: 'Sugestions are always welcome', value: 'Leave your sugestions about what i can improve in the #Sugestions channel.' },
 			{ name: '\u200B', value: '\u200B' },
 			{ name: 'Rules', value: 'In the channel <#747495985378361356> you will be able to find the server rules.', inline: true },
 			{ name: 'Order Plugins', value: 'Here in the channel <#805668197457592341> you can order plugins.', inline: true },
