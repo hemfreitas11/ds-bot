@@ -1455,7 +1455,7 @@ async function comandoBug(interaction) {
 	const message = interaction
 
 	let title = isEnglish ? 'How To Report A Bug' : 'Como Reportar Um Bug'
-	let titl = isEnglish ? `Hi there, c'm here to help!` : `Olá, eu estou aqui para ajudar!`
+	let titl = isEnglish ? `Hi there, i'm here to help!` : `Olá, eu estou aqui para ajudar!`
 	let cmdTitle = isEnglish ? `To ensure the problem is properly described, plese fill the form bellow with the details of the bug.` : `Para garantir que o problema seja descrito de forma correta, preencha o formulário abaixo com os detalhes do bug.`
 	let desc = isEnglish ? 'Short description of the problem' : 'Pequena descrição do problema'
 	let usage = isEnglish ? 'Did you try to do anything to fix it? If yes, what?' : 'Você tentou fazer algo para arrumar o bug? Se sim, o que?'
